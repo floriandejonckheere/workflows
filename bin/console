@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "bundler/setup"
+require "logger"
+
+require "workflows"
+
+logger = Logger.new($stdout)
+logger.level = ENV.fetch("LOG_LEVEL", "info")
+
+require "irb"
+IRB.start(__FILE__)

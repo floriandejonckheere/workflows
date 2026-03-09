@@ -1,0 +1,77 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - '**'
+    tags:
+      - '**'
+
+concurrency:
+  group: ${{ github.workflow }}-ci-${{ github.event.repository.name }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Continuous Integration
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@0c366fd6a839edf440554fa01a7085ccba70ac98 # v6.0.2
+        with:
+          fetch-depth: 1
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@896e71e063dc0933bb442a54e949d75291991ecb # v1.288.0
+        with:
+          ruby-version: 4.0.1
+          bundler-cache: true
+
+      - name: Test
+        run: bundle exec rspec --profile 10 --format progress
+
+      - name: Lint
+        run: bundle exec rubocop --parallel --display-cop-names
+
+  release:
+    name: Release application
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@0c366fd6a839edf440554fa01a7085ccba70ac98 # v6.0.2
+        with:
+          fetch-depth: 1
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@896e71e063dc0933bb442a54e949d75291991ecb # v1.288.0
+        with:
+          ruby-version: 4.0.1
+          bundler-cache: true
+
+      - name: Set version
+        run: |
+          echo "VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
+      - name: Publish to RubyGems
+        run: |
+          mkdir -p ~/.gem
+          touch ~/.gem/credentials
+          chmod 0600 ~/.gem/credentials
+          printf -- "---\n:rubygems_api_key: ${GEM_HOST_API_KEY}\n" > ~/.gem/credentials
+          gem build *.gemspec
+          gem push *.gem
+        env:
+          GEM_HOST_API_KEY: ${{secrets.RUBYGEMS_API_KEY}}
+
+      - name: Create Github Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          body: |
+            Gem ${{ github.event.repository.name }} ${{ env.VERSION }} was released
