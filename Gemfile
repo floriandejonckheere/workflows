@@ -9,6 +9,9 @@ gemspec
 gem "rspec"
 gem "rspec-rails"
 
+# Self-contained database system [https://sqlite.org/]
+gem "sqlite3"
+
 # The Ruby linter/formatter [https://github.com/rubocop/rubocop]
 gem "rubocop"
 gem "rubocop-performance"
