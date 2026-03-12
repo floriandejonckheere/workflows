@@ -12,6 +12,9 @@ gem "rspec-rails"
 # Self-contained database system [https://sqlite.org/]
 gem "sqlite3"
 
+# Background job processing (required by the dummy Rails app in test/)
+gem "solid_queue"
+
 # The Ruby linter/formatter [https://github.com/rubocop/rubocop]
 gem "rubocop"
 gem "rubocop-performance"

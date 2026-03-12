@@ -29,8 +29,21 @@ require "workflows"
 
 ## Testing
 
-```ssh
-# Run test suite
+The gem includes a minimal Rails dummy app in `spec/dummy/` for integration testing.
+
+### Setup
+
+```bash
+cd test/dummy
+bundle install
+bundle exec rails db:create db:migrate
+```
+
+### Running specs
+
+From the gem root:
+
+```bash
 bundle exec rspec
 ```
 
