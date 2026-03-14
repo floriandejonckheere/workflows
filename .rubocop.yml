@@ -7,6 +7,9 @@ plugins:
 AllCops:
   NewCops: enable
   TargetRubyVersion: 4.0
+  Exclude:
+    - bin/*
+    - spec/dummy/**/*
 
 Layout/LineLength:
   Enabled: false
