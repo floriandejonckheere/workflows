@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 # This file is auto-generated from the current state of the database. Instead
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
@@ -12,5 +10,26 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 0) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_14_144617) do
+  create_table "workflow_steps", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "error_class"
+    t.text "error_message"
+    t.datetime "finished_at"
+    t.string "state", default: "pending", null: false
+    t.string "type", null: false
+    t.datetime "updated_at", null: false
+    t.integer "workflows_id", null: false
+    t.index ["workflows_id"], name: "index_workflow_steps_on_workflows_id"
+  end
+
+  create_table "workflows", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "finished_at"
+    t.string "state", default: "pending", null: false
+    t.string "type", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  add_foreign_key "workflow_steps", "workflows", column: "workflows_id", on_delete: :cascade
 end
