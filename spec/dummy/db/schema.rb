@@ -12,10 +12,11 @@
 
 ActiveRecord::Schema[8.1].define(version: 2026_03_14_144617) do
   create_table "workflow_steps", force: :cascade do |t|
+    t.datetime "completed_at"
     t.datetime "created_at", null: false
     t.string "error_class"
     t.text "error_message"
-    t.datetime "finished_at"
+    t.datetime "failed_at"
     t.string "state", default: "pending", null: false
     t.string "type", null: false
     t.datetime "updated_at", null: false
@@ -24,8 +25,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_14_144617) do
   end
 
   create_table "workflows", force: :cascade do |t|
+    t.datetime "completed_at"
     t.datetime "created_at", null: false
-    t.datetime "finished_at"
+    t.datetime "failed_at"
     t.string "state", default: "pending", null: false
     t.string "type", null: false
     t.datetime "updated_at", null: false
