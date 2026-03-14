@@ -14,7 +14,9 @@ module Workflows
     ].freeze
 
     has_many :steps,
-             class_name: "Workflows::Step"
+             class_name: "Workflows::Step",
+             dependent: :destroy,
+             inverse_of: :workflow
 
     enum :state,
          STATES.index_by(&:itself),

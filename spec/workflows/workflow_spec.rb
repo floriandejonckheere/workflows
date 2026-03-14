@@ -4,7 +4,7 @@ RSpec.describe Workflows::Workflow do
   subject(:workflow) { described_class.new }
 
   describe "associations" do
-    it { is_expected.to have_many :steps }
+    it { is_expected.to have_many(:steps).dependent(:destroy).inverse_of(:workflow) }
   end
 
   describe "enums" do
