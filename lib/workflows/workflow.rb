@@ -2,6 +2,8 @@
 
 module Workflows
   class Workflow < Workflows.configuration.parent_model_class.constantize
+    include DSL
+
     self.table_name = "workflows"
 
     STATES = [
