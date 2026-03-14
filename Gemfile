@@ -5,6 +5,9 @@ source "https://rubygems.org"
 # Specify your gem's dependencies in workflows.gemspec
 gemspec
 
+# Ruby debugger [https://github.com/ruby/debug]
+gem "debug"
+
 # Behavior-driven testing framework [https://github.com/rspec/rspec-rails]
 gem "rspec"
 gem "rspec-rails"
