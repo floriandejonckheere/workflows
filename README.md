@@ -31,18 +31,46 @@ This will create the workflows initializer, migrations, and models.
 
 Create a workflow using the generator:
 
-    $ rails generate workflows:workflow onboarding
+    $ rails generate workflows:workflow video_processing
 
-This will create an `app/workflows/onboarding_workflow.rb` file.
+This will create an `app/workflows/video_processing_workflow.rb` file.
 
 Create workflow steps using the generator:
 
-    $ rails generate workflows:step onboarding/welcome
-    $ rails generate workflows:step onboarding/verify_email
-    $ rails generate workflows:step onboarding/complete_profile
-    $ rails generate workflows:step onboarding/tour
+    $ rails generate workflows:step video_processing/validate_format
+    $ rails generate workflows:step video_processing/extract_metadata
+    $ rails generate workflows:step video_processing/generate_thumbnails
+    $ rails generate workflows:step video_processing/upload_to_cdn
+    $ rails generate workflows:step video_processing/publish_video
 
-This will create `app/workflows/onboarding/welcome_step.rb`, `app/workflows/onboarding/verify_email_step.rb` and other files.
+This will create `app/workflows/video_processing/validate_format.rb`, etc.
+
+Then, define the steps in the `video_processing_workflow.rb` file, along with their dependencies:
+
+```ruby
+class VideoProcessingWorkflow < Workflows::Workflow
+  workflow do
+    step :validate_format
+
+    step :extract_metadata,
+         depends_on: [:validate_format]
+
+    step :generate_thumbnails,
+         depends_on: [:extract_metadata]
+
+    step :upload_to_cdn,
+         depends_on: [:generate_thumbnails]
+
+    step :publish_video,
+         depends_on: [:upload_to_cdn]
+  end
+end
+```
+
+This workflow is a simple, linear workflow where each subsequent step depends on the previous one.
+If a step fails to process, the workflow will halt and not execute the steps that depend on the failed step.
+
+Refer to [`spec/dummy/app/workflows`](spec/dummy/app/workflows) for more comprehensive examples of linear and non-linear workflows. 
 
 ## Testing
 
@@ -51,7 +79,7 @@ The gem includes a minimal Rails dummy app in `spec/dummy/` for integration test
 ### Setup
 
 ```bash
-cd test/dummy
+cd spec/dummy
 bundle install
 bundle exec rails db:create db:migrate
 ```
