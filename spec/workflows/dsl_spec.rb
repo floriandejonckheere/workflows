@@ -60,19 +60,19 @@ RSpec.describe Workflows::DSL do
 
   describe "#step" do
     it "defines a workflow step" do
-      step_one = workflow.steps.first
+      step_one = workflow._steps.first
 
       expect(step_one).to be_a Workflows::DSL::Step
       expect(step_one.name).to eq :one
       expect(step_one.depends_on).to be_empty
 
-      step_two = workflow.steps.second
+      step_two = workflow._steps.second
 
       expect(step_two).to be_a Workflows::DSL::Step
       expect(step_two.name).to eq :two
       expect(step_two.depends_on).to contain_exactly(:one)
 
-      step_three = workflow.steps.third
+      step_three = workflow._steps.third
 
       expect(step_three).to be_a Workflows::DSL::Step
       expect(step_three.name).to eq :three

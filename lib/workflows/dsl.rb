@@ -5,7 +5,7 @@ module Workflows
     extend ActiveSupport::Concern
 
     included do
-      class_attribute :steps,
+      class_attribute :_steps,
                       default: []
     end
 
@@ -15,7 +15,7 @@ module Workflows
       end
 
       def step(name, depends_on: [])
-        steps << Step.new(name, depends_on:)
+        _steps << Step.new(name, depends_on:)
       end
     end
 
