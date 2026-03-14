@@ -12,6 +12,11 @@ gem "rspec-rails"
 # Shoulda-matchers [https://github.com/thoughtbot/shoulda-matchers]
 gem "shoulda-matchers"
 
+# Factory testing pattern [https://github.com/thoughtbot/factory_bot]
+gem "factory_bot"
+gem "factory_bot_rails"
+gem "ffaker"
+
 # Self-contained database system [https://sqlite.org/]
 gem "sqlite3"
 
@@ -20,6 +25,7 @@ gem "solid_queue"
 
 # The Ruby linter/formatter [https://github.com/rubocop/rubocop]
 gem "rubocop"
+gem "rubocop-factory_bot"
 gem "rubocop-performance"
 gem "rubocop-rails"
 gem "rubocop-rspec"
