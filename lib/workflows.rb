@@ -25,6 +25,14 @@ module Workflows
       loader.setup
       loader.eager_load
     end
+
+    def configuration
+      @configuration ||= Configuration.new
+    end
+
+    def configure
+      yield configuration
+    end
   end
 end
 
