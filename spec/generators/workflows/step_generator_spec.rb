@@ -2,9 +2,9 @@
 
 require "rails/generators/testing/behavior"
 
-require "generators/workflows/workflow_generator"
+require "generators/workflows/step_generator"
 
-RSpec.describe Workflows::WorkflowGenerator do
+RSpec.describe Workflows::StepGenerator do
   include Rails::Generators::Testing::Behavior
   include FileUtils
 
@@ -15,15 +15,15 @@ RSpec.describe Workflows::WorkflowGenerator do
   after { rm_rf(destination_root) }
 
   describe "model" do
-    before { run_generator ["Onboarding"] }
+    before { run_generator ["Onboarding::Welcome"] }
 
     it "creates the model file" do
-      expect(File).to exist(File.join(destination_root, "app/workflows/onboarding_workflow.rb"))
+      expect(File).to exist(File.join(destination_root, "app/workflows/onboarding/welcome_step.rb"))
     end
 
     it "defines the correct class" do
-      expect(File.read(File.join(destination_root, "app/workflows/onboarding_workflow.rb")))
-        .to include("class OnboardingWorkflow < Workflows::Workflow")
+      expect(File.read(File.join(destination_root, "app/workflows/onboarding/welcome_step.rb")))
+        .to include("class Onboarding::WelcomeStep < Workflows::Step")
     end
   end
 end

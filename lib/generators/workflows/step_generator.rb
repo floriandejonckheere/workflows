@@ -3,13 +3,13 @@
 require "rails/generators"
 
 module Workflows
-  class WorkflowGenerator < Rails::Generators::NamedBase
+  class StepGenerator < Rails::Generators::NamedBase
     source_root File.expand_path("templates", __dir__)
 
-    desc "Creates a workflow model"
+    desc "Creates a workflow step model"
 
     def create_workflow
-      template "workflow.rb.erb", "app/workflows/#{file_path}_workflow.rb"
+      template "step.rb.erb", "app/workflows/#{file_path}_step.rb"
     end
   end
 end

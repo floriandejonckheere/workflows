@@ -29,9 +29,20 @@ This will create the workflows initializer, migrations, and models.
 
 ## Usage
 
-```ruby
-require "workflows"
-```
+Create a workflow using the generator:
+
+    $ rails generate workflows:workflow onboarding
+
+This will create an `app/workflows/onboarding_workflow.rb` file.
+
+Create workflow steps using the generator:
+
+    $ rails generate workflows:step onboarding/welcome
+    $ rails generate workflows:step onboarding/verify_email
+    $ rails generate workflows:step onboarding/complete_profile
+    $ rails generate workflows:step onboarding/tour
+
+This will create `app/workflows/onboarding/welcome_step.rb`, `app/workflows/onboarding/verify_email_step.rb` and other files.
 
 ## Testing
 
