@@ -19,8 +19,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_14_144617) do
     t.string "state", default: "pending", null: false
     t.string "type", null: false
     t.datetime "updated_at", null: false
-    t.integer "workflows_id", null: false
-    t.index ["workflows_id"], name: "index_workflow_steps_on_workflows_id"
+    t.integer "workflow_id", null: false
+    t.index ["workflow_id"], name: "index_workflow_steps_on_workflow_id"
   end
 
   create_table "workflows", force: :cascade do |t|
@@ -31,5 +31,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_14_144617) do
     t.datetime "updated_at", null: false
   end
 
-  add_foreign_key "workflow_steps", "workflows", column: "workflows_id", on_delete: :cascade
+  add_foreign_key "workflow_steps", "workflows", on_delete: :cascade
 end

@@ -15,7 +15,7 @@ class CreateWorkflowTables < ActiveRecord::Migration[7.0]
       t.string :state, null: false, default: "pending"
       t.datetime :finished_at
 
-      t.references :workflows, null: false, foreign_key: { on_delete: :cascade }, index: true
+      t.references :workflow, null: false, foreign_key: { on_delete: :cascade }, index: true
 
       t.string :error_class
       t.text :error_message
