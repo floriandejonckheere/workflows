@@ -64,3 +64,6 @@ build-iPhoneSimulator/
 ## Temp files
 .byebug_history
 html/
+
+# Dummy app
+spec/dummy
