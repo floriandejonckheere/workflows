@@ -21,6 +21,12 @@ Or install it yourself as:
 
     $ gem install workflows
 
+Run the installation generator:
+
+    $ rails generate workflows:install
+
+This will create the workflows initializer, migrations, and models.
+
 ## Usage
 
 ```ruby

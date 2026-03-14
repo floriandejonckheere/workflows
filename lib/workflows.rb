@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "rails"
+
 require "zeitwerk"
 
 module Workflows
@@ -16,6 +18,9 @@ module Workflows
 
       # Register inflections
       require root.join("config/inflections.rb")
+
+      # Ignore generators directory — Rails handles loading these, not Zeitwerk
+      loader.ignore(root.join("lib/generators"))
 
       loader.setup
       loader.eager_load
