@@ -9,7 +9,7 @@ AllCops:
   TargetRubyVersion: 4.0
   Exclude:
     - bin/*
-    - spec/dummy/**/*
+    - spec/dummy/db/*
 
 Layout/LineLength:
   Enabled: false
