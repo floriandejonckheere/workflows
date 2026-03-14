@@ -9,6 +9,9 @@ gemspec
 gem "rspec"
 gem "rspec-rails"
 
+# Shoulda-matchers [https://github.com/thoughtbot/shoulda-matchers]
+gem "shoulda-matchers"
+
 # Self-contained database system [https://sqlite.org/]
 gem "sqlite3"
 
