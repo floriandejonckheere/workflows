@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe Workflows::Step do
-  subject(:step) { described_class.new }
+  subject(:step) { create(:step) }
 
   describe "associations" do
     it { is_expected.to belong_to :workflow }

@@ -21,5 +21,13 @@ module Workflows
     enum :state,
          STATES.index_by(&:itself),
          validate: true
+
+    def all_steps_completed?
+      steps.any? && steps.all? { |step| step.state == "completed" }
+    end
+
+    def any_step_failed?
+      steps.any? { |step| step.state == "failed" }
+    end
   end
 end
