@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
 module Checkout
-  class SendConfirmationEmailStep < Workflows::Step
+  class SendConfirmationStep < Workflows::Step
   end
 end

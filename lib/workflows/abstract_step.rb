@@ -9,7 +9,7 @@ module Workflows
     def initialize(name, depends_on: [], class_name: nil)
       @name = name
       @depends_on = depends_on
-      @class_name = class_name || "#{name.to_s.camelize}Step".constantize
+      @class_name = (class_name || "#{name.to_s.camelize}Step").constantize
     end
   end
 end

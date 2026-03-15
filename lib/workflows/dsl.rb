@@ -31,10 +31,11 @@ module Workflows
         yield self
       end
 
-      def step(name, depends_on: [])
+      def step(name, depends_on: [], class_name: nil)
         abstract_workflow.steps << AbstractStep.new(
           name,
           depends_on:,
+          class_name:,
         )
       end
     end
