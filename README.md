@@ -72,6 +72,42 @@ If a step fails to process, the workflow will halt and not execute the steps tha
 
 Refer to [`spec/dummy/app/workflows`](spec/dummy/app/workflows) for more comprehensive examples of linear and non-linear workflows. 
 
+### Workflows
+
+Define an abstract workflow on your workflow model by calling the `workflow` method.
+This method takes no arguments.
+
+```ruby
+workflow do
+  # ...
+end
+```
+
+### Steps
+
+Define an abstract step inside your abstract workflow by calling the `steps` method.
+
+```ruby
+step :my_step
+```
+
+The step class name is automatically inferred from the step name.
+To override this, pass the `class_name` argument.
+
+```ruby
+step :my_step,
+     class_name: "YourStep"
+```
+
+To define dependencies between steps, pass the `depends_on` argument with an array of step **names** (not class names).
+
+```ruby
+step :my_step
+
+step :your_step,
+     depends_on: [:my_step]
+```
+
 ## Testing
 
 The gem includes a minimal Rails dummy app in `spec/dummy/` for integration testing.
