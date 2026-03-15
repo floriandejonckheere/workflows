@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe Workflows::DSL do
-  subject(:workflow) { example_workflow_class.create! }
+  subject(:workflow) { example_workflow_class.new }
 
   let(:example_workflow_class) do
     Class.new(Workflows::Workflow) do
@@ -55,6 +55,24 @@ RSpec.describe Workflows::DSL do
       def self.name
         "FourStep"
       end
+    end
+  end
+
+  before do
+    stub_const("OneStep", one_step_class)
+    stub_const("TwoStep", two_step_class)
+    stub_const("ThreeStep", three_step_class)
+    stub_const("FourStep", four_step_class)
+  end
+
+  describe "callbacks" do
+    it "creates workflow steps after creation" do
+      expect { workflow.save! }
+        .to change(Workflows::Step, :count)
+        .by(4)
+
+      expect(workflow.steps.pluck(:type))
+        .to eq ["OneStep", "TwoStep", "ThreeStep", "FourStep"]
     end
   end
 

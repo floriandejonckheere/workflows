@@ -7,6 +7,22 @@ module Workflows
     included do
       class_attribute :abstract_workflow,
                       default: AbstractWorkflow.new
+
+      def self.inherited(subclass)
+        super
+
+        subclass.abstract_workflow = AbstractWorkflow.new
+      end
+
+      after_create :create_steps
+
+      def create_steps
+        abstract_workflow.steps.each do |abstract_step|
+          steps.create!(
+            type: abstract_step.class_name,
+          )
+        end
+      end
     end
 
     class_methods do
