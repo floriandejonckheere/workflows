@@ -5,8 +5,8 @@ module Workflows
     extend ActiveSupport::Concern
 
     included do
-      class_attribute :_steps,
-                      default: []
+      class_attribute :abstract_workflow,
+                      default: AbstractWorkflow.new
     end
 
     class_methods do
@@ -15,17 +15,10 @@ module Workflows
       end
 
       def step(name, depends_on: [])
-        _steps << Step.new(name, depends_on:)
-      end
-    end
-
-    class Step
-      attr_reader :name,
-                  :depends_on
-
-      def initialize(name, depends_on: [])
-        @name = name
-        @depends_on = depends_on
+        abstract_workflow.steps << AbstractStep.new(
+          name,
+          depends_on:,
+        )
       end
     end
   end

@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 RSpec.describe Workflows::DSL do
-  subject(:workflow) { my_workflow_class.new }
+  subject(:workflow) { example_workflow_class.create! }
 
-  let(:my_workflow_class) do
-    Class.new do
+  let(:example_workflow_class) do
+    Class.new(Workflows::Workflow) do
       include Workflows::DSL
 
       workflow do
@@ -21,7 +21,7 @@ RSpec.describe Workflows::DSL do
       end
 
       def self.name
-        "MyWorkflow"
+        "ExampleWorkflow"
       end
     end
   end
@@ -58,23 +58,32 @@ RSpec.describe Workflows::DSL do
     end
   end
 
-  describe "#step" do
-    it "defines a workflow step" do
-      step_one = workflow._steps.first
+  describe "#workflow" do
+    it "defines an abstract workflow" do
+      abstract_workflow = workflow.abstract_workflow
 
-      expect(step_one).to be_a Workflows::DSL::Step
+      expect(abstract_workflow).to be_a Workflows::AbstractWorkflow
+    end
+  end
+
+  describe "#step" do
+    it "defines an abstract workflow step" do
+      abstract_workflow = workflow.abstract_workflow
+      step_one = abstract_workflow.steps.first
+
+      expect(step_one).to be_a Workflows::AbstractStep
       expect(step_one.name).to eq :one
       expect(step_one.depends_on).to be_empty
 
-      step_two = workflow._steps.second
+      step_two = abstract_workflow.steps.second
 
-      expect(step_two).to be_a Workflows::DSL::Step
+      expect(step_two).to be_a Workflows::AbstractStep
       expect(step_two.name).to eq :two
       expect(step_two.depends_on).to contain_exactly(:one)
 
-      step_three = workflow._steps.third
+      step_three = abstract_workflow.steps.third
 
-      expect(step_three).to be_a Workflows::DSL::Step
+      expect(step_three).to be_a Workflows::AbstractStep
       expect(step_three.name).to eq :three
       expect(step_three.depends_on).to contain_exactly(:two)
     end
