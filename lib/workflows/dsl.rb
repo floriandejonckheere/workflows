@@ -19,6 +19,7 @@ module Workflows
       def create_steps
         abstract_workflow.steps.each do |abstract_step|
           steps.create!(
+            name: abstract_step.name,
             type: abstract_step.class_name,
           )
         end

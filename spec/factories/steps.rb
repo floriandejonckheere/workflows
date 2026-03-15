@@ -3,6 +3,7 @@
 FactoryBot.define do
   factory :step, class: "Workflows::Step" do
     workflow
+    sequence(:name) { |i| "step_#{i}" }
     type { "Workflows::Step" }
     state { "pending" }
 

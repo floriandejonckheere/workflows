@@ -4,7 +4,12 @@ RSpec.describe Workflows::Step do
   subject(:step) { create(:step) }
 
   describe "associations" do
-    it { is_expected.to belong_to :workflow }
+    it { is_expected.to belong_to(:workflow) }
+  end
+
+  describe "validations" do
+    it { is_expected.to validate_presence_of(:name) }
+    it { is_expected.to validate_uniqueness_of(:name).scoped_to(:workflow_id) }
   end
 
   describe "enums" do

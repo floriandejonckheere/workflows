@@ -15,6 +15,10 @@ module Workflows
                optional: false,
                class_name: "Workflows::Workflow"
 
+    validates :name,
+              presence: true,
+              uniqueness: { scope: :workflow_id }
+
     enum :state,
          STATES.index_by(&:itself),
          validate: true

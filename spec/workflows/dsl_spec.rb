@@ -71,8 +71,19 @@ RSpec.describe Workflows::DSL do
         .to change(Workflows::Step, :count)
         .by(4)
 
-      expect(workflow.steps.pluck(:type))
-        .to eq ["OneStep", "TwoStep", "ThreeStep", "FourStep"]
+      step_one, step_two, step_three, step_four = workflow.steps
+
+      expect(step_one).to be_a one_step_class
+      expect(step_one.name).to eq "one"
+
+      expect(step_two).to be_a two_step_class
+      expect(step_two.name).to eq "two"
+
+      expect(step_three).to be_a three_step_class
+      expect(step_three.name).to eq "three"
+
+      expect(step_four).to be_a four_step_class
+      expect(step_four.name).to eq "four"
     end
   end
 

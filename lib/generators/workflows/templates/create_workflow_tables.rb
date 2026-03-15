@@ -12,6 +12,7 @@ class CreateWorkflowTables < ActiveRecord::Migration[7.0]
     end
 
     create_table :workflow_steps do |t|
+      t.string :name, null: false
       t.string :type, null: false
       t.string :state, null: false, default: "pending"
       t.datetime :completed_at
@@ -24,5 +25,7 @@ class CreateWorkflowTables < ActiveRecord::Migration[7.0]
 
       t.timestamps
     end
+
+    add_index :workflow_steps, [:workflow_id, :name], unique: true
   end
 end
