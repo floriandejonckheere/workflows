@@ -10,6 +10,8 @@ RSpec.describe Workflows::Step do
   describe "validations" do
     it { is_expected.to validate_presence_of(:name) }
     it { is_expected.to validate_uniqueness_of(:name).scoped_to(:workflow_id) }
+
+    it { is_expected.to validate_presence_of(:class_name) }
   end
 
   describe "enums" do

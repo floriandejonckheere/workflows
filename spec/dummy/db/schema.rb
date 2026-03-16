@@ -12,14 +12,15 @@
 
 ActiveRecord::Schema[8.1].define(version: 2026_03_14_144617) do
   create_table "workflow_steps", force: :cascade do |t|
+    t.string "class_name", null: false
     t.datetime "completed_at"
     t.datetime "created_at", null: false
+    t.string "depends_on", default: "[]", null: false
     t.string "error_class"
     t.text "error_message"
     t.datetime "failed_at"
     t.string "name", null: false
     t.string "state", default: "pending", null: false
-    t.string "type", null: false
     t.datetime "updated_at", null: false
     t.integer "workflow_id", null: false
     t.index ["workflow_id", "name"], name: "index_workflow_steps_on_workflow_id_and_name", unique: true
@@ -27,11 +28,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_14_144617) do
   end
 
   create_table "workflows", force: :cascade do |t|
+    t.string "class_name", null: false
     t.datetime "completed_at"
     t.datetime "created_at", null: false
     t.datetime "failed_at"
+    t.string "name", null: false
     t.string "state", default: "pending", null: false
-    t.string "type", null: false
     t.datetime "updated_at", null: false
   end
 

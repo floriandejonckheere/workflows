@@ -7,6 +7,11 @@ RSpec.describe Workflows::Workflow do
     it { is_expected.to have_many(:steps).dependent(:destroy).inverse_of(:workflow) }
   end
 
+  describe "validations" do
+    it { is_expected.to validate_presence_of(:name) }
+    it { is_expected.to validate_presence_of(:class_name) }
+  end
+
   describe "enums" do
     it { is_expected.to define_enum_for(:state).with_values(pending: "pending", processing: "processing", completed: "completed", failed: "failed").backed_by_column_of_type(:string) }
   end

@@ -19,6 +19,9 @@ module Workflows
               presence: true,
               uniqueness: { scope: :workflow_id }
 
+    validates :class_name,
+              presence: true
+
     enum :state,
          STATES.index_by(&:itself),
          validate: true

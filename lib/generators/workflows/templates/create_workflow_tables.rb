@@ -3,8 +3,11 @@
 class CreateWorkflowTables < ActiveRecord::Migration[7.0]
   def change
     create_table :workflows do |t|
-      t.string :type, null: false
+      t.string :name, null: false
+      t.string :class_name, null: false
+
       t.string :state, null: false, default: "pending"
+
       t.datetime :completed_at
       t.datetime :failed_at
 
@@ -13,10 +16,14 @@ class CreateWorkflowTables < ActiveRecord::Migration[7.0]
 
     create_table :workflow_steps do |t|
       t.string :name, null: false
-      t.string :type, null: false
+      t.string :class_name, null: false
+
       t.string :state, null: false, default: "pending"
+
       t.datetime :completed_at
       t.datetime :failed_at
+
+      t.string :depends_on, null: false, array: true, default: []
 
       t.references :workflow, null: false, foreign_key: { on_delete: :cascade }, index: true
 

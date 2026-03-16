@@ -2,7 +2,8 @@
 
 FactoryBot.define do
   factory :workflow, class: "Workflows::Workflow" do
-    type { "Workflows::Workflow" }
+    name { "my_workflow" }
+    class_name { "MyWorkflow" }
     state { "pending" }
 
     trait :with_steps do

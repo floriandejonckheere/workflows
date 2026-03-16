@@ -3,8 +3,9 @@
 FactoryBot.define do
   factory :step, class: "Workflows::Step" do
     workflow
-    sequence(:name) { |i| "step_#{i}" }
-    type { "Workflows::Step" }
+
+    sequence(:name) { |i| "my_step_#{i}" }
+    class_name { name.camelize }
     state { "pending" }
 
     trait :processing do
