@@ -9,5 +9,13 @@ module Workflows
     def parent_model_class=(value)
       @parent_model_class = value.to_s
     end
+
+    def parent_job_class
+      @parent_job_class ||= "ActiveJob::Base"
+    end
+
+    def parent_job_class=(value)
+      @parent_job_class = value.to_s
+    end
   end
 end

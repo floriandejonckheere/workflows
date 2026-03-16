@@ -14,4 +14,16 @@ RSpec.describe Workflows::Configuration do
       expect(configuration.parent_model_class).to eq "MyClass"
     end
   end
+
+  describe "#parent_job_class. #parent_job_class=" do
+    it "has a default" do
+      expect(configuration.parent_job_class).to eq "ActiveJob::Base"
+    end
+
+    it "gets and sets parent job class" do
+      configuration.parent_job_class = "MyClass"
+
+      expect(configuration.parent_job_class).to eq "MyClass"
+    end
+  end
 end
