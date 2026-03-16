@@ -5,6 +5,11 @@
 
 Workflow orchestration framework for Ruby on Rails background processing jobs.
 
+## Prerequisites
+
+- Rails 8.1+
+- SolidQueue as ActiveJob adapter
+
 ## Installation
 
 Add this line to your application's Gemfile:
