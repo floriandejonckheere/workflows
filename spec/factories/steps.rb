@@ -5,7 +5,6 @@ FactoryBot.define do
     workflow
 
     sequence(:name) { |i| "my_step_#{i}" }
-    class_name { name.camelize }
     state { "pending" }
 
     trait :processing do

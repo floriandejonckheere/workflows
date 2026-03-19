@@ -17,4 +17,12 @@ RSpec.describe Workflows::Step do
   describe "enums" do
     it { is_expected.to define_enum_for(:state).with_values(pending: "pending", processing: "processing", completed: "completed", failed: "failed").backed_by_column_of_type(:string) }
   end
+
+  describe "callbacks" do
+    it "sets the class name if not specified" do
+      step = create(:step, name: "first")
+
+      expect(step.class_name).to eq "FirstStep"
+    end
+  end
 end
