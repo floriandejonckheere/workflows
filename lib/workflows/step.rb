@@ -6,6 +6,7 @@ module Workflows
 
     STATES = [
       "pending",
+      "enqueued",
       "processing",
       "completed",
       "failed",

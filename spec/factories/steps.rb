@@ -7,6 +7,14 @@ FactoryBot.define do
     sequence(:name) { |i| "my_step_#{i}" }
     state { "pending" }
 
+    trait :pending do
+      state { "pending" }
+    end
+
+    trait :enqueued do
+      state { "enqueued" }
+    end
+
     trait :processing do
       state { "processing" }
     end
