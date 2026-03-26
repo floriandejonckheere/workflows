@@ -3,8 +3,7 @@
 class CreateWorkflowTables < ActiveRecord::Migration[7.0]
   def change
     create_table :workflows do |t|
-      t.string :name, null: false
-      t.string :class_name, null: false
+      t.string :type, null: false
 
       t.string :state, null: false, default: "pending"
 
@@ -16,7 +15,7 @@ class CreateWorkflowTables < ActiveRecord::Migration[7.0]
 
     create_table :workflow_steps do |t|
       t.string :name, null: false
-      t.string :class_name, null: false
+      t.string :type, null: false
 
       t.string :state, null: false, default: "pending"
 

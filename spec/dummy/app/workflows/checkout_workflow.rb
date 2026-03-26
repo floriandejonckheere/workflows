@@ -20,7 +20,7 @@ class CheckoutWorkflow < Workflows::Workflow
          depends_on: [:process_payment]
 
     step :send_confirmation_email,
-         class_name: "SendConfirmationStep",
+         type: "SendConfirmationStep",
          depends_on: [:process_payment]
 
     step :trigger_fulfillment,

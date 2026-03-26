@@ -20,7 +20,7 @@ RSpec.describe Workflows::DSL do
              depends_on: [:three]
 
         step :five,
-             class_name: "OneStep",
+             type: "OneStep",
              depends_on: [:four]
       end
 
@@ -75,7 +75,7 @@ RSpec.describe Workflows::DSL do
         .to change(Workflows::WorkflowStep, :count)
         .by(5)
 
-      step_one, step_two, step_three, step_four, step_five = workflow.abstract_workflow_steps
+      step_one, step_two, step_three, step_four, step_five = workflow.workflow_steps
 
       expect(step_one).to be_a one_step_class
       expect(step_one.name).to eq "one"
@@ -110,27 +110,27 @@ RSpec.describe Workflows::DSL do
       expect(step_one).to be_a Workflows::AbstractStep
       expect(step_one.name).to eq :one
       expect(step_one.depends_on).to be_empty
-      expect(step_one.class_name).to eq one_step_class
+      expect(step_one.type).to eq one_step_class
 
       expect(step_two).to be_a Workflows::AbstractStep
       expect(step_two.name).to eq :two
       expect(step_two.depends_on).to contain_exactly(:one)
-      expect(step_two.class_name).to eq two_step_class
+      expect(step_two.type).to eq two_step_class
 
       expect(step_three).to be_a Workflows::AbstractStep
       expect(step_three.name).to eq :three
       expect(step_three.depends_on).to contain_exactly(:two)
-      expect(step_three.class_name).to eq three_step_class
+      expect(step_three.type).to eq three_step_class
 
       expect(step_four).to be_a Workflows::AbstractStep
       expect(step_four.name).to eq :four
       expect(step_four.depends_on).to contain_exactly(:three)
-      expect(step_four.class_name).to eq four_step_class
+      expect(step_four.type).to eq four_step_class
 
       expect(step_five).to be_a Workflows::AbstractStep
       expect(step_five.name).to eq :five
       expect(step_five.depends_on).to contain_exactly(:four)
-      expect(step_five.class_name).to eq one_step_class
+      expect(step_five.type).to eq one_step_class
     end
   end
 end

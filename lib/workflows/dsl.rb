@@ -18,9 +18,9 @@ module Workflows
 
       def create_workflow_steps
         abstract_workflow.abstract_workflow_steps.each do |abstract_step|
-          abstract_workflow_steps.create!(
+          workflow_steps.create!(
             name: abstract_step.name,
-            type: abstract_step.class_name,
+            type: abstract_step.type,
           )
         end
       end
@@ -31,11 +31,11 @@ module Workflows
         yield self
       end
 
-      def step(name, depends_on: [], class_name: nil)
+      def step(name, depends_on: [], type: nil)
         abstract_workflow.abstract_workflow_steps << AbstractStep.new(
           name,
           depends_on:,
-          class_name:,
+          type:,
         )
       end
     end

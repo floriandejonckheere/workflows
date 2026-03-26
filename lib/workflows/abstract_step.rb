@@ -3,13 +3,13 @@
 module Workflows
   class AbstractStep
     attr_reader :name,
-                :depends_on,
-                :class_name
+                :type,
+                :depends_on
 
-    def initialize(name, depends_on: [], class_name: nil)
+    def initialize(name, depends_on: [], type: nil)
       @name = name
       @depends_on = depends_on
-      @class_name = (class_name || "#{name.to_s.camelize}Step").constantize
+      @type = (type || "#{name.to_s.camelize}Step").constantize
     end
   end
 end

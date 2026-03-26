@@ -101,7 +101,7 @@ To override this, pass the `class_name` argument.
 
 ```ruby
 step :my_step,
-     class_name: "YourStep"
+     type: "YourStep"
 ```
 
 To define dependencies between workflow steps, pass the `depends_on` argument with an array of step **names** (not class names).

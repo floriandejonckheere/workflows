@@ -18,10 +18,7 @@ module Workflows
              dependent: :destroy,
              inverse_of: :workflow
 
-    validates :name,
-              presence: true
-
-    validates :class_name,
+    validates :type,
               presence: true
 
     enum :state,
