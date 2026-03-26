@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Workflows
-  class AbstractStep
+  class AbstractWorkflowStep
     attr_reader :name,
                 :type,
                 :depends_on
