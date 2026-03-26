@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 RSpec.describe Workflows::DSL do
-  subject(:workflow) { example_workflow_class.new }
+  subject(:workflow) { workflow_one_class.new }
 
-  let(:example_workflow_class) do
+  let(:workflow_one_class) do
     Class.new(Workflows::Workflow) do
       include Workflows::DSL
 
@@ -25,7 +25,7 @@ RSpec.describe Workflows::DSL do
       end
 
       def self.name
-        "ExampleWorkflow"
+        "WorkflowOne"
       end
     end
   end
