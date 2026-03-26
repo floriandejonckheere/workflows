@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class CheckoutWorkflow < Workflows::Workflow
-  workflow do
+  workflow :checkout do
     step :check_stock
 
     step :calculate_shipping,

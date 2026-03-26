@@ -4,12 +4,22 @@ module Workflows
   class AbstractWorkflowStep
     attr_reader :name,
                 :type,
-                :depends_on
+                :depends_on,
+                :namespace
 
-    def initialize(name, depends_on: [], type: nil)
+    def initialize(name, depends_on: [], type: nil, namespace: nil)
       @name = name
       @depends_on = depends_on
-      @type = (type || "#{name.to_s.camelize}Step").constantize
+      @namespace = namespace
+
+      @type = [namespace.to_s.camelize, type || "#{name.to_s.camelize}Step"]
+        .compact
+        .join("::")
+        .constantize
+    end
+
+    def inspect
+      "#<Workflows::AbstractWorkflowStep steps=[#{abstract_workflow_steps.map(&:name).join(', ')}]>"
     end
   end
 end

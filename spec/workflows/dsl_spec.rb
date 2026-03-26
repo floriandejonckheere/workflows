@@ -30,10 +30,32 @@ RSpec.describe Workflows::DSL do
     end
   end
 
+  let(:workflow_two_class) do
+    Class.new(Workflows::Workflow) do
+      include Workflows::DSL
+
+      workflow :nested do
+        step :one
+      end
+
+      def self.name
+        "WorkflowTwo"
+      end
+    end
+  end
+
   let(:one_step_class) do
     Class.new(Workflows::WorkflowStep) do
       def self.name
         "OneStep"
+      end
+    end
+  end
+
+  let(:nested_one_step_class) do
+    Class.new(Workflows::WorkflowStep) do
+      def self.name
+        "Nested::OneStep"
       end
     end
   end
@@ -64,6 +86,7 @@ RSpec.describe Workflows::DSL do
 
   before do
     stub_const("OneStep", one_step_class)
+    stub_const("Nested::OneStep", nested_one_step_class)
     stub_const("TwoStep", two_step_class)
     stub_const("ThreeStep", three_step_class)
     stub_const("FourStep", four_step_class)
@@ -96,9 +119,37 @@ RSpec.describe Workflows::DSL do
 
   describe "#workflow" do
     it "defines an abstract workflow" do
-      abstract_workflow = workflow.abstract_workflow
+      klass = Class.new(Workflows::Workflow) do
+        include Workflows::DSL
+      end
 
-      expect(abstract_workflow).to be_a Workflows::AbstractWorkflow
+      klass.workflow { nil }
+
+      expect(klass.abstract_workflow).to be_a Workflows::AbstractWorkflow
+    end
+
+    it "defines an abstract workflow with a namespace" do
+      klass = Class.new(Workflows::Workflow) do
+        include Workflows::DSL
+      end
+
+      klass.workflow(:namespace) { nil }
+
+      expect(klass.abstract_workflow.namespace).to eq :namespace
+    end
+
+    it "overrides an existing workflow" do
+      klass = Class.new(Workflows::Workflow) do
+        include Workflows::DSL
+      end
+
+      klass.workflow { nil }
+
+      abstract_workflow = klass.abstract_workflow
+
+      klass.workflow { nil }
+
+      expect(klass.abstract_workflow).not_to eq abstract_workflow
     end
   end
 
