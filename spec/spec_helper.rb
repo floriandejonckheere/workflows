@@ -24,11 +24,14 @@ require "bundler/setup"
 require File.expand_path("../spec/dummy/config/environment", __dir__)
 ActiveRecord::Migrator.migrations_paths = [File.expand_path("../spec/dummy/db/migrate", __dir__)]
 
+require "rspec/rails"
 require "workflows"
 
 Dir[File.join(__dir__, "support/**/*.rb")].each { |f| require f }
 
 RSpec.configure do |config|
+  config.use_transactional_fixtures = true
+
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
   # assertions if you prefer.
