@@ -12,6 +12,7 @@ AllCops:
   Exclude:
     - bin/*
     - spec/dummy/db/*
+    - vendor/**/*
 
 Layout/LineLength:
   Enabled: false
