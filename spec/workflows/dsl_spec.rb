@@ -31,7 +31,7 @@ RSpec.describe Workflows::DSL do
   end
 
   let(:one_step_class) do
-    Class.new(Workflows::Step) do
+    Class.new(Workflows::WorkflowStep) do
       def self.name
         "OneStep"
       end
@@ -39,7 +39,7 @@ RSpec.describe Workflows::DSL do
   end
 
   let(:two_step_class) do
-    Class.new(Workflows::Step) do
+    Class.new(Workflows::WorkflowStep) do
       def self.name
         "TwoStep"
       end
@@ -47,7 +47,7 @@ RSpec.describe Workflows::DSL do
   end
 
   let(:three_step_class) do
-    Class.new(Workflows::Step) do
+    Class.new(Workflows::WorkflowStep) do
       def self.name
         "ThreeStep"
       end
@@ -55,7 +55,7 @@ RSpec.describe Workflows::DSL do
   end
 
   let(:four_step_class) do
-    Class.new(Workflows::Step) do
+    Class.new(Workflows::WorkflowStep) do
       def self.name
         "FourStep"
       end
@@ -72,10 +72,10 @@ RSpec.describe Workflows::DSL do
   describe "callbacks" do
     it "creates workflow steps after creation" do
       expect { workflow.save! }
-        .to change(Workflows::Step, :count)
+        .to change(Workflows::WorkflowStep, :count)
         .by(5)
 
-      step_one, step_two, step_three, step_four, step_five = workflow.steps
+      step_one, step_two, step_three, step_four, step_five = workflow.abstract_workflow_steps
 
       expect(step_one).to be_a one_step_class
       expect(step_one.name).to eq "one"
@@ -105,7 +105,7 @@ RSpec.describe Workflows::DSL do
   describe "#step" do
     it "defines an abstract workflow step" do
       abstract_workflow = workflow.abstract_workflow
-      step_one, step_two, step_three, step_four, step_five = abstract_workflow.steps
+      step_one, step_two, step_three, step_four, step_five = abstract_workflow.abstract_workflow_steps
 
       expect(step_one).to be_a Workflows::AbstractStep
       expect(step_one.name).to eq :one

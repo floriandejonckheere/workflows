@@ -6,22 +6,22 @@ FactoryBot.define do
     class_name { "MyWorkflow" }
     state { "pending" }
 
-    trait :with_steps do
+    trait :with_workflow_steps do
       transient do
-        workflow_steps { [] }
+        abstract_workflow_steps { [] }
       end
 
       after(:build) do |workflow, evaluator|
-        evaluator.workflow_steps.each do |step|
+        evaluator.abstract_workflow_steps.each do |step|
           attributes = step.is_a?(Hash) ? step.dup : { type: }
           traits = Array(attributes.delete(:traits))
 
-          workflow.steps << build(:step, *traits, workflow:, **attributes)
+          workflow.workflow_steps << build(:workflow_step, *traits, workflow:, **attributes)
         end
       end
 
       after(:create) do |workflow|
-        workflow.steps.select(&:new_record?).each(&:save!)
+        workflow.workflow_steps.select(&:new_record?).each(&:save!)
       end
     end
 

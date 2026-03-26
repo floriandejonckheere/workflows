@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
 module Checkout
-  class ReserveInventoryStep < Workflows::Step
+  class ReserveInventoryStep < Workflows::WorkflowStep
   end
 end

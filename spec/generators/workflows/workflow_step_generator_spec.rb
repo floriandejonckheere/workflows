@@ -2,9 +2,9 @@
 
 require "rails/generators/testing/behavior"
 
-require "generators/workflows/step_generator"
+require "generators/workflows/workflow_step_generator"
 
-RSpec.describe Workflows::StepGenerator do
+RSpec.describe Workflows::WorkflowStepGenerator do
   include Rails::Generators::Testing::Behavior
   include FileUtils
 
@@ -23,7 +23,7 @@ RSpec.describe Workflows::StepGenerator do
 
     it "defines the correct class" do
       expect(File.read(File.join(destination_root, "app/workflows/onboarding/welcome_step.rb")))
-        .to include("class Onboarding::WelcomeStep < Workflows::Step")
+        .to include("class Onboarding::WelcomeStep < Workflows::WorkflowStep")
     end
   end
 end

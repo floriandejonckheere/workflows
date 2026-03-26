@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-RSpec.describe Workflows::Step do
-  subject(:step) { create(:step) }
+RSpec.describe Workflows::WorkflowStep do
+  subject(:workflow_step) { create(:workflow_step) }
 
   describe "associations" do
     it { is_expected.to belong_to(:workflow) }
@@ -20,7 +20,7 @@ RSpec.describe Workflows::Step do
 
   describe "callbacks" do
     it "sets the class name if not specified" do
-      step = create(:step, name: "first")
+      step = create(:workflow_step, name: "first")
 
       expect(step.class_name).to eq "FirstStep"
     end

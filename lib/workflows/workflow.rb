@@ -13,8 +13,8 @@ module Workflows
       "failed",
     ].freeze
 
-    has_many :steps,
-             class_name: "Workflows::Step",
+    has_many :workflow_steps,
+             class_name: "Workflows::WorkflowStep",
              dependent: :destroy,
              inverse_of: :workflow
 
@@ -28,12 +28,12 @@ module Workflows
          STATES.index_by(&:itself),
          validate: true
 
-    def all_steps_completed?
-      steps.any? && steps.all? { |step| step.state == "completed" }
+    def all_workflow_steps_completed?
+      workflow_steps.any? && workflow_steps.all? { |step| step.state == "completed" }
     end
 
-    def any_step_failed?
-      steps.any? { |step| step.state == "failed" }
+    def any_workflow_step_failed?
+      workflow_steps.any? { |step| step.state == "failed" }
     end
   end
 end

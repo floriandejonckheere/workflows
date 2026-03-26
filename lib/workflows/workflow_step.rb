@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Workflows
-  class Step < Workflows.configuration.parent_model_class.constantize
+  class WorkflowStep < Workflows.configuration.parent_model_class.constantize
     self.table_name = "workflow_steps"
 
     STATES = [

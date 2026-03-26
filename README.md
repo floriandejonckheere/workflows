@@ -42,15 +42,15 @@ This will create an `app/workflows/video_processing_workflow.rb` file.
 
 Create workflow steps using the generator:
 
-    $ rails generate workflows:step video_processing/validate_format
-    $ rails generate workflows:step video_processing/extract_metadata
-    $ rails generate workflows:step video_processing/generate_thumbnails
-    $ rails generate workflows:step video_processing/upload_to_cdn
-    $ rails generate workflows:step video_processing/publish_video
+    $ rails generate workflows:workflow_step video_processing/validate_format
+    $ rails generate workflows:workflow_step video_processing/extract_metadata
+    $ rails generate workflows:workflow_step video_processing/generate_thumbnails
+    $ rails generate workflows:workflow_step video_processing/upload_to_cdn
+    $ rails generate workflows:workflow_step video_processing/publish_video
 
 This will create `app/workflows/video_processing/validate_format.rb`, etc.
 
-Then, define the steps in the `video_processing_workflow.rb` file, along with their dependencies:
+Then, define the workflow steps in the `video_processing_workflow.rb` file, along with their dependencies:
 
 ```ruby
 class VideoProcessingWorkflow < Workflows::Workflow
@@ -73,7 +73,7 @@ end
 ```
 
 This workflow is a simple, linear workflow where each subsequent step depends on the previous one.
-If a step fails to process, the workflow will halt and not execute the steps that depend on the failed step.
+If a step fails to process, the workflow will halt and not execute the workflow steps that depend on the failed step.
 
 Refer to [`spec/dummy/app/workflows`](spec/dummy/app/workflows) for more comprehensive examples of linear and non-linear workflows. 
 
@@ -90,7 +90,7 @@ end
 
 ### Steps
 
-Define an abstract step inside your abstract workflow by calling the `steps` method.
+Define an abstract step inside your abstract workflow by calling the `step` method.
 
 ```ruby
 step :my_step
@@ -104,7 +104,7 @@ step :my_step,
      class_name: "YourStep"
 ```
 
-To define dependencies between steps, pass the `depends_on` argument with an array of step **names** (not class names).
+To define dependencies between workflow steps, pass the `depends_on` argument with an array of step **names** (not class names).
 
 ```ruby
 step :my_step

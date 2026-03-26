@@ -14,11 +14,11 @@ module Workflows
         subclass.abstract_workflow = AbstractWorkflow.new
       end
 
-      after_create :create_steps
+      after_create :create_workflow_steps
 
-      def create_steps
-        abstract_workflow.steps.each do |abstract_step|
-          steps.create!(
+      def create_workflow_steps
+        abstract_workflow.abstract_workflow_steps.each do |abstract_step|
+          abstract_workflow_steps.create!(
             name: abstract_step.name,
             type: abstract_step.class_name,
           )
@@ -32,7 +32,7 @@ module Workflows
       end
 
       def step(name, depends_on: [], class_name: nil)
-        abstract_workflow.steps << AbstractStep.new(
+        abstract_workflow.abstract_workflow_steps << AbstractStep.new(
           name,
           depends_on:,
           class_name:,

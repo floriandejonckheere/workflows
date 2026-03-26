@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
 module Checkout
-  class CalculateTaxesStep < Workflows::Step
+  class CalculateTaxesStep < Workflows::WorkflowStep
   end
 end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
 module Checkout
-  class ProcessPaymentStep < Workflows::Step
+  class ProcessPaymentStep < Workflows::WorkflowStep
   end
 end

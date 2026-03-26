@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :step, class: "Workflows::Step" do
+  factory :workflow_step, class: "Workflows::WorkflowStep" do
     workflow
 
-    sequence(:name) { |i| "my_step_#{i}" }
+    sequence(:name) { |i| "my_workflow_step_#{i}" }
     state { "pending" }
 
     trait :pending do
