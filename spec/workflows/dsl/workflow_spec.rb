@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-RSpec.describe Workflows::DSL do
+RSpec.describe Workflows::DSL::Workflow do
   subject(:workflow) { workflow_one_class.new }
 
   let(:workflow_one_class) do
     Class.new(Workflows::Workflow) do
-      include Workflows::DSL
+      include Workflows::DSL::Workflow
 
       workflow do
         step :one

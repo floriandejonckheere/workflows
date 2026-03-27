@@ -2,7 +2,7 @@
 
 module Workflows
   class Workflow < Workflows.configuration.parent_model_class.constantize
-    include DSL
+    include DSL::Workflow
 
     self.table_name = "workflows"
 
