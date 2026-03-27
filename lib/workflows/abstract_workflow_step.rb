@@ -19,7 +19,7 @@ module Workflows
     end
 
     def inspect
-      "#<Workflows::AbstractWorkflowStep steps=[#{abstract_workflow_steps.map(&:name).join(', ')}]>"
+      "#<Workflows::AbstractWorkflowStep name=#{name} type=#{type}>"
     end
   end
 end
