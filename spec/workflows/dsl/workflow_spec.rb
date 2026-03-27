@@ -187,5 +187,10 @@ RSpec.describe Workflows::DSL::Workflow do
       expect(step_five.depends_on).to contain_exactly(:four)
       expect(step_five.type).to eq one_step_class
     end
+
+    it "raises when a step is already defined" do
+      expect { workflow_one_class.step :one }
+        .to raise_error ArgumentError
+    end
   end
 end

@@ -32,6 +32,8 @@ module Workflows
         end
 
         def step(name, depends_on: [], type: nil)
+          raise ArgumentError, "Step #{name} is already defined" if abstract_workflow.abstract_workflow_steps.key?(name)
+
           abstract_workflow.abstract_workflow_steps[name] = AbstractWorkflowStep.new(
             name,
             depends_on:,
