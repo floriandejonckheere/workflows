@@ -23,7 +23,6 @@ module Workflows
       loader.ignore(root.join("lib/generators"))
 
       loader.setup
-      loader.eager_load
     end
 
     def configuration
