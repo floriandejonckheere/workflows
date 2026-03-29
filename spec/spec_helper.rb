@@ -29,6 +29,8 @@ require "workflows"
 
 Dir[File.join(__dir__, "support/**/*.rb")].each { |f| require f }
 
+ActiveJob::Base.queue_adapter = :test
+
 RSpec.configure do |config|
   config.use_transactional_fixtures = true
 
