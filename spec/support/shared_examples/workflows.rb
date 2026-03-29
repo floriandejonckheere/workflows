@@ -4,11 +4,11 @@ RSpec.shared_context "workflows" do # rubocop:disable RSpec/ContextWording
   ##
   # Dependency graph:
   #
-  # five
-  # └── four
+  # one
+  # └── two
   #     └── three
-  #         └── two
-  #             └── one
+  #         └── four
+  #             └── five
   #
   let(:workflow_one_class) do
     Class.new(Workflows::Workflow) do
@@ -59,10 +59,10 @@ RSpec.shared_context "workflows" do # rubocop:disable RSpec/ContextWording
   ##
   # Dependency graph:
   #
-  # four
-  # ├── three
-  # │   └── one
-  # └── two
+  # one
+  # └── three ──┐
+  #             four
+  # two ────────┘
   #
   let(:workflow_three_class) do
     Class.new(Workflows::Workflow) do
@@ -81,8 +81,35 @@ RSpec.shared_context "workflows" do # rubocop:disable RSpec/ContextWording
     end
   end
 
+  ##
+  # Dependency graph:
+  #
+  # one
+  # ├── three
+  # │   └── four
+  # └── two
+  #
+  let(:workflow_four_class) do
+    Class.new(Workflows::Workflow) do
+      include Workflows::DSL::Workflow
+
+      workflow do
+        step :one
+        step :two, depends_on: [:one]
+        step :three, depends_on: [:one]
+        step :four, depends_on: [:three]
+      end
+
+      def self.name
+        "WorkflowFour"
+      end
+    end
+  end
+
   let(:one_step_class) do
     Class.new(Workflows::WorkflowStep) do
+      def call(...); end
+
       def self.name
         "OneStep"
       end
@@ -91,6 +118,8 @@ RSpec.shared_context "workflows" do # rubocop:disable RSpec/ContextWording
 
   let(:nested_one_step_class) do
     Class.new(Workflows::WorkflowStep) do
+      def call(...); end
+
       def self.name
         "Nested::OneStep"
       end
@@ -99,6 +128,8 @@ RSpec.shared_context "workflows" do # rubocop:disable RSpec/ContextWording
 
   let(:two_step_class) do
     Class.new(Workflows::WorkflowStep) do
+      def call(...); end
+
       def self.name
         "TwoStep"
       end
@@ -107,6 +138,8 @@ RSpec.shared_context "workflows" do # rubocop:disable RSpec/ContextWording
 
   let(:three_step_class) do
     Class.new(Workflows::WorkflowStep) do
+      def call(...); end
+
       def self.name
         "ThreeStep"
       end
@@ -115,6 +148,8 @@ RSpec.shared_context "workflows" do # rubocop:disable RSpec/ContextWording
 
   let(:four_step_class) do
     Class.new(Workflows::WorkflowStep) do
+      def call(...); end
+
       def self.name
         "FourStep"
       end
@@ -122,6 +157,7 @@ RSpec.shared_context "workflows" do # rubocop:disable RSpec/ContextWording
   end
 
   before do
+    # Step constants need to be stubbed first
     stub_const("OneStep", one_step_class)
     stub_const("Nested::OneStep", nested_one_step_class)
     stub_const("TwoStep", two_step_class)
@@ -131,5 +167,6 @@ RSpec.shared_context "workflows" do # rubocop:disable RSpec/ContextWording
     stub_const("WorkflowOne", workflow_one_class)
     stub_const("WorkflowTwo", workflow_two_class)
     stub_const("WorkflowThree", workflow_three_class)
+    stub_const("WorkflowFour", workflow_four_class)
   end
 end
