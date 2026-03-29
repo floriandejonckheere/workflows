@@ -5,14 +5,19 @@ FactoryBot.define do
     type { "Workflows::Workflow" }
     state { "pending" }
 
+    initialize_with do
+      klass = type.constantize
+      klass.new(attributes)
+    end
+
     trait :with_workflow_steps do
       transient do
-        abstract_workflow_steps { [] }
+        transient_workflow_steps { [] }
       end
 
       after(:build) do |workflow, evaluator|
-        evaluator.abstract_workflow_steps.each do |step|
-          attributes = step.is_a?(Hash) ? step.dup : { type: }
+        evaluator.transient_workflow_steps.each do |step|
+          attributes = step.is_a?(Hash) ? step.dup : {}
           traits = Array(attributes.delete(:traits))
 
           workflow.workflow_steps << build(:workflow_step, *traits, workflow:, **attributes)

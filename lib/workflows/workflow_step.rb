@@ -26,5 +26,12 @@ module Workflows
     enum :state,
          STATES.index_by(&:itself),
          validate: true
+
+    def abstract_workflow_step
+      workflow
+        .abstract_workflow
+        .abstract_workflow_steps
+        .fetch(name.to_sym)
+    end
   end
 end
