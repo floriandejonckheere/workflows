@@ -80,7 +80,8 @@ Refer to [`spec/dummy/app/workflows`](spec/dummy/app/workflows) for more compreh
 ### Workflows
 
 Define an abstract workflow on your workflow model by calling the `workflow` method.
-This method takes no arguments.
+This method takes (optionally) a namespace and a block.
+The namespace is used to resolve step classes.
 
 ```ruby
 workflow do
@@ -93,24 +94,78 @@ end
 Define an abstract step inside your abstract workflow by calling the `step` method.
 
 ```ruby
-step :my_step
+workflow do
+  step :do_something
+end
 ```
 
 The step class name is automatically inferred from the step name.
-To override this, pass the `class_name` argument.
+To override this, pass the `type` argument.
 
 ```ruby
-step :my_step,
-     type: "YourStep"
+workflow do
+    # Resolves to DoSomethingStep
+    step :do_something
+    
+    # Resolves to DoAnythingStep
+    step :do_something_else,
+         type: "DoAnything"
+end
+```
+
+If a namespace is passed to the `workflow`, it is prepended before the step name.
+
+```ruby
+workflow :my_namespace do
+  # Resolves to MyNamespace::DoSomethingStep
+  step :do_something
+  
+  # Resolves to MyNamespace::DoAnythingStep
+  step :do_something_else,
+       type: "DoAnything"
+end
 ```
 
 To define dependencies between workflow steps, pass the `depends_on` argument with an array of step **names** (not class names).
 
 ```ruby
-step :my_step
+workflow do
+    step :my_step
+    
+    step :your_step,
+         depends_on: [:my_step]
+end
+```
 
-step :your_step,
-     depends_on: [:my_step]
+### Migrating
+
+Whenever a workflow is executed, workflow and workflow steps are created in the database.
+This also means that when you make changes to the workflow, you need to make sure they are either backwards compatible, you migrate (or delete) existing (not complete) workflow and workflow step records, or use a versioning strategy for your workflows.
+Not doing this could lead to inconsistencies, such as missing steps in the workflow, errors trying to execute a step that no longer exists, or others.
+The records are persisted in the STI-aware `workflows` and `workflow_steps` tables.
+The workflow records persist the state, and type (class name) of the workflow.
+The workflow step records persist the state, type (class name), and (unique) name of the workflow step.
+See [`spec/dummy/db/schema.rb`](spec/dummy/db/schema.rb) for the table schema.
+
+```ruby
+module VideoProcessingWorkflow
+  class V1 < Workflows::Workflow
+  workflow do
+    step :validate_format
+
+    step :extract_metadata,
+         depends_on: [:validate_format]
+
+    step :generate_thumbnails,
+         depends_on: [:extract_metadata]
+
+    step :upload_to_cdn,
+         depends_on: [:generate_thumbnails]
+
+    step :publish_video,
+         depends_on: [:upload_to_cdn]
+  end
+end
 ```
 
 ## Testing
