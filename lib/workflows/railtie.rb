@@ -8,6 +8,8 @@ module Workflows
 
     generators do
       require "generators/workflows/install_generator"
+      require "generators/workflows/workflow_generator"
+      require "generators/workflows/workflow_step_generator"
     end
   end
 end
