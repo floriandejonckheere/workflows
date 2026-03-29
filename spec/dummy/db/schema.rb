@@ -14,7 +14,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_14_144617) do
   create_table "workflow_steps", force: :cascade do |t|
     t.datetime "completed_at"
     t.datetime "created_at", null: false
-    t.string "depends_on", default: "[]", null: false
     t.string "error_class"
     t.text "error_message"
     t.datetime "failed_at"

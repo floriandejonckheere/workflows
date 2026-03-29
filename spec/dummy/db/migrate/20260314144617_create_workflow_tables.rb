@@ -22,8 +22,6 @@ class CreateWorkflowTables < ActiveRecord::Migration[7.0]
       t.datetime :completed_at
       t.datetime :failed_at
 
-      t.string :depends_on, null: false, array: true, default: "[]"
-
       t.references :workflow, null: false, foreign_key: { on_delete: :cascade }, index: true
 
       t.string :error_class
