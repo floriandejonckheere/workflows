@@ -48,7 +48,7 @@ Create workflow steps using the generator:
     $ rails generate workflows:workflow_step video_processing/upload_to_cdn
     $ rails generate workflows:workflow_step video_processing/publish_video
 
-This will create `app/workflows/video_processing/validate_format.rb`, etc.
+This will create `app/workflows/video_processing/validate_format_step.rb`, etc.
 
 Then, define the workflow steps in the `video_processing_workflow.rb` file, along with their dependencies:
 

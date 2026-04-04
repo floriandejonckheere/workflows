@@ -8,7 +8,7 @@ module Workflows
 
     desc "Creates a workflow step model"
 
-    def create_workflow
+    def create_workflow_step
       template "step.rb.erb", "app/workflows/#{file_path}_step.rb"
     end
   end
