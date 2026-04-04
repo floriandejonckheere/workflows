@@ -34,7 +34,7 @@ RSpec.describe Workflows::WorkflowStepJob do
         expect(workflow_step.error_message).to eq "This is an error message"
       end
 
-      it "enqueues workflow job" do
+      it "enqueues a workflow job" do
         expect { job.perform(workflow, workflow_step) }
           .to have_enqueued_job(Workflows::WorkflowJob)
           .exactly(:once)
@@ -79,7 +79,7 @@ RSpec.describe Workflows::WorkflowStepJob do
             .not_to(change { workflow_step.reload.state })
         end
 
-        it "enqueues workflow job" do
+        it "enqueues a workflow job" do
           expect { job.perform(workflow, workflow_step) }
             .to have_enqueued_job(Workflows::WorkflowJob)
             .exactly(:once)
@@ -107,7 +107,7 @@ RSpec.describe Workflows::WorkflowStepJob do
           .not_to(change { workflow_step.reload.state })
       end
 
-      it "enqueues workflow job" do
+      it "enqueues a workflow job" do
         expect { job.perform(workflow, workflow_step) }
           .to have_enqueued_job(Workflows::WorkflowJob)
           .exactly(:once)
@@ -134,7 +134,7 @@ RSpec.describe Workflows::WorkflowStepJob do
           .not_to(change { workflow_step.reload.state })
       end
 
-      it "enqueues workflow job" do
+      it "enqueues a workflow job" do
         expect { job.perform(workflow, workflow_step) }
           .to have_enqueued_job(Workflows::WorkflowJob)
           .exactly(:once)

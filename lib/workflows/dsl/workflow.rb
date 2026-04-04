@@ -24,6 +24,11 @@ module Workflows
             )
           end
         end
+
+        def perform_later(*, **)
+          WorkflowJob
+            .perform_later(self, *, **)
+        end
       end
 
       class_methods do

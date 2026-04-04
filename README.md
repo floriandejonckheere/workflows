@@ -77,6 +77,24 @@ If a step fails to process, the workflow will halt and not execute the workflow 
 
 Refer to [`spec/dummy/app/workflows`](spec/dummy/app/workflows) for more comprehensive examples of linear and non-linear workflows. 
 
+Finally, define the workflow step logic in each class:
+
+```ruby
+class ValidateFormatStep < Workflows::WorkflowStep
+  def call(...)
+    # Business logic
+  end
+end
+```
+
+```ruby
+class ExtractMetadataStep < Workflows::WorkflowStep
+  def call(...)
+    # Business logic
+  end
+end
+```
+
 ### Workflows
 
 Define an abstract workflow on your workflow model by calling the `workflow` method.
@@ -136,6 +154,18 @@ workflow do
          depends_on: [:my_step]
 end
 ```
+
+### Executing
+
+After creating a workflow record (the workflow step records are automatically created), execute the workflow by calling the `perform_later` method:
+
+```ruby
+workflow = VideoProcessingWorkflow.create!
+
+workflow.perform_later
+```
+
+Any arguments passed to `perform_later` will be passed down to the `call` method in the step classes.
 
 ### Migrating
 

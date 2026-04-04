@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe Workflows::DSL::Workflow do
-  subject(:workflow) { workflow_one_class.new }
+  subject(:workflow) { create(:workflow, type: workflow_one_class.name) }
 
   include_context "workflows"
 
@@ -30,7 +30,23 @@ RSpec.describe Workflows::DSL::Workflow do
     end
   end
 
-  describe "#workflow" do
+  describe "#perform_later" do
+    it "enqueues a workflow job" do
+      expect { workflow.perform_later }
+        .to have_enqueued_job(Workflows::WorkflowJob)
+        .exactly(:once)
+        .with(workflow)
+    end
+
+    it "passes arguments to the workflow job" do
+      expect { workflow.perform_later("argument_one", argument: "two") }
+        .to have_enqueued_job(Workflows::WorkflowJob)
+        .exactly(:once)
+        .with(workflow, "argument_one", argument: "two")
+    end
+  end
+
+  describe ".workflow" do
     it "defines an abstract workflow" do
       klass = Class.new(Workflows::Workflow) do
         include Workflows::DSL
@@ -66,7 +82,7 @@ RSpec.describe Workflows::DSL::Workflow do
     end
   end
 
-  describe "#step" do
+  describe ".step" do
     it "defines an abstract workflow step" do
       abstract_workflow = workflow.abstract_workflow
 
