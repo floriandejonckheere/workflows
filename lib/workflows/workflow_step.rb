@@ -10,6 +10,7 @@ module Workflows
       "processing",
       "completed",
       "failed",
+      "skipped",
     ].freeze
 
     belongs_to :workflow,

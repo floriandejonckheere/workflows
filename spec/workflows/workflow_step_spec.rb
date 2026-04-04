@@ -15,6 +15,6 @@ RSpec.describe Workflows::WorkflowStep do
   end
 
   describe "enums" do
-    it { is_expected.to define_enum_for(:state).with_values(pending: "pending", enqueued: "enqueued", processing: "processing", completed: "completed", failed: "failed").backed_by_column_of_type(:string) }
+    it { is_expected.to define_enum_for(:state).with_values(pending: "pending", enqueued: "enqueued", processing: "processing", completed: "completed", failed: "failed", skipped: "skipped").backed_by_column_of_type(:string) }
   end
 end

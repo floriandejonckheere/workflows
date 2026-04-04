@@ -31,5 +31,9 @@ FactoryBot.define do
       error_class { "StandardError" }
       error_message { "Something went wrong" }
     end
+
+    trait :skipped do
+      state { "skipped" }
+    end
   end
 end
