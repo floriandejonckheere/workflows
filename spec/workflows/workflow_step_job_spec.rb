@@ -3,10 +3,8 @@
 RSpec.describe Workflows::WorkflowStepJob do
   subject(:job) { described_class.new }
 
-  let(:workflow) { workflow_three_class.create! }
+  let(:workflow) { WorkflowThree.create! }
   let(:workflow_step) { workflow.workflow_steps.find_by(name: "one") }
-
-  include_context "workflows"
 
   describe "#perform" do
     ["pending", "processing"].each do |state|

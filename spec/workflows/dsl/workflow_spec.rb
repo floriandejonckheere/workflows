@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe Workflows::DSL::Workflow do
-  subject(:workflow) { create(:workflow, type: workflow_one_class.name) }
-
-  include_context "workflows"
+  subject(:workflow) { create(:workflow, type: WorkflowOne.name) }
 
   describe "callbacks" do
     it "creates workflow steps after creation" do
@@ -13,19 +11,19 @@ RSpec.describe Workflows::DSL::Workflow do
 
       step_one, step_two, step_three, step_four, step_five = workflow.workflow_steps
 
-      expect(step_one).to be_a one_step_class
+      expect(step_one).to be_a OneStep
       expect(step_one.name).to eq "one"
 
-      expect(step_two).to be_a two_step_class
+      expect(step_two).to be_a TwoStep
       expect(step_two.name).to eq "two"
 
-      expect(step_three).to be_a three_step_class
+      expect(step_three).to be_a ThreeStep
       expect(step_three.name).to eq "three"
 
-      expect(step_four).to be_a four_step_class
+      expect(step_four).to be_a FourStep
       expect(step_four.name).to eq "four"
 
-      expect(step_five).to be_a one_step_class
+      expect(step_five).to be_a OneStep
       expect(step_five.name).to eq "five"
     end
   end
@@ -90,35 +88,35 @@ RSpec.describe Workflows::DSL::Workflow do
       expect(step_one).to be_a Workflows::AbstractWorkflowStep
       expect(step_one.name).to eq :one
       expect(step_one.depends_on).to be_empty
-      expect(step_one.type).to eq one_step_class
+      expect(step_one.type).to eq OneStep
 
       step_two = abstract_workflow.abstract_workflow_steps[:two]
       expect(step_two).to be_a Workflows::AbstractWorkflowStep
       expect(step_two.name).to eq :two
       expect(step_two.depends_on).to contain_exactly(:one)
-      expect(step_two.type).to eq two_step_class
+      expect(step_two.type).to eq TwoStep
 
       step_three = abstract_workflow.abstract_workflow_steps[:three]
       expect(step_three).to be_a Workflows::AbstractWorkflowStep
       expect(step_three.name).to eq :three
       expect(step_three.depends_on).to contain_exactly(:two)
-      expect(step_three.type).to eq three_step_class
+      expect(step_three.type).to eq ThreeStep
 
       step_four = abstract_workflow.abstract_workflow_steps[:four]
       expect(step_four).to be_a Workflows::AbstractWorkflowStep
       expect(step_four.name).to eq :four
       expect(step_four.depends_on).to contain_exactly(:three)
-      expect(step_four.type).to eq four_step_class
+      expect(step_four.type).to eq FourStep
 
       step_five = abstract_workflow.abstract_workflow_steps[:five]
       expect(step_five).to be_a Workflows::AbstractWorkflowStep
       expect(step_five.name).to eq :five
       expect(step_five.depends_on).to contain_exactly(:four)
-      expect(step_five.type).to eq one_step_class
+      expect(step_five.type).to eq OneStep
     end
 
     it "raises when a step is already defined" do
-      expect { workflow_one_class.step :one }
+      expect { WorkflowOne.step :one }
         .to raise_error ArgumentError
     end
   end
