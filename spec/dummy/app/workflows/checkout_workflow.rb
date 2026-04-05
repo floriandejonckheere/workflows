@@ -1,5 +1,23 @@
 # frozen_string_literal: true
 
+##
+# Complex workflow with many, dependent steps
+#
+# check_stock
+# ├── calculate_shipping
+# │   └── create_order
+# ├── calculate_taxes
+# │   └── create_order
+# └── (implicit dependency on both shipping and taxes)
+#     └── create_order
+#         ├── process_payment
+#         │   ├── reserve_inventory
+#         │   │   └── trigger_fulfillment
+#         │   └── send_confirmation_email
+#         │       └── trigger_fulfillment
+#         └── (implicit dependency on both reserve and email)
+#             └── trigger_fulfillment
+#
 class CheckoutWorkflow < Workflows::Workflow
   workflow :checkout do
     step :check_stock

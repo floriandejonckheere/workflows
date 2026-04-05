@@ -1,5 +1,14 @@
 # frozen_string_literal: true
 
+##
+# Simple, linear workflow
+#
+# validate_format
+# └── extract_metadata
+#     └── generate_thumbnails
+#         └── upload_to_cdn
+#             └── publish_video
+#
 class VideoProcessingWorkflow < Workflows::Workflow
   workflow do
     step :validate_format
