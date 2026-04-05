@@ -14,16 +14,33 @@ RSpec.describe Workflows::WorkflowStepGenerator do
   before { prepare_destination }
   after { rm_rf(destination_root) }
 
-  describe "model" do
-    before { run_generator ["Onboarding::Welcome"] }
+  describe "without namespace" do
+    before { run_generator ["register"] }
 
     it "creates the model file" do
-      expect(File).to exist(File.join(destination_root, "app/workflows/onboarding/welcome_step.rb"))
+      expect(File).to exist(File.join(destination_root, "app/workflow_steps/register_step.rb"))
     end
 
     it "defines the correct class" do
-      expect(File.read(File.join(destination_root, "app/workflows/onboarding/welcome_step.rb")))
-        .to include("class Onboarding::WelcomeStep < Workflows::WorkflowStep")
+      content = File.read(File.join(destination_root, "app/workflow_steps/register_step.rb"))
+
+      expect(content).to include("class RegisterStep < Workflows::WorkflowStep")
+      expect(content).not_to include("module")
+    end
+  end
+
+  describe "namespaced" do
+    before { run_generator ["onboarding/register"] }
+
+    it "creates the model file" do
+      expect(File).to exist(File.join(destination_root, "app/workflow_steps/onboarding/register_step.rb"))
+    end
+
+    it "defines the correct class" do
+      content = File.read(File.join(destination_root, "app/workflow_steps/onboarding/register_step.rb"))
+
+      expect(content).to include("module Onboarding")
+      expect(content).to include("class RegisterStep < Workflows::WorkflowStep")
     end
   end
 end

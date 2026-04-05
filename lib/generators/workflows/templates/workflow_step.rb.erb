@@ -1,7 +1,17 @@
 # frozen_string_literal: true
 
+<% if class_name.include?("::") -%>
+module <%= class_name.deconstantize %>
+  class <%= class_name.demodulize %>Step < Workflows::WorkflowStep
+    def call(...)
+      # ...
+    end
+  end
+end
+<% else -%>
 class <%= class_name %>Step < Workflows::WorkflowStep
   def call(...)
     # ...
   end
 end
+<% end -%>

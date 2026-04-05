@@ -72,6 +72,12 @@ class VideoProcessingWorkflow < Workflows::Workflow
 end
 ```
 
+Alternatively, specify the steps using the workflow generator directly:
+
+    $ rails generate workflows:workflow video_processing validate_format extract_metadata generate_thumbnails upload_to_cdn publish_video
+
+The workflow steps will be created under the `video_processing` namespace, and the steps will be inserted in the workflow file.
+
 This workflow is a simple, linear workflow where each subsequent step depends on the previous one.
 If a step fails to process, the workflow will halt and not execute the workflow steps that depend on the failed step.
 
