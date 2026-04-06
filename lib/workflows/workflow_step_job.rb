@@ -11,14 +11,14 @@ module Workflows
       # Nothing to do if this workflow step has already been finalized
       return if workflow_step.completed? || workflow_step.failed?
 
-      # Find all completed step names
-      completed_step_names = workflow
+      # Find all completed or skipped step names
+      completed_or_skipped_step_names = workflow
         .workflow_steps
-        .completed
+        .where(state: ["completed", "skipped"])
         .map(&:name)
 
       # Check if workflow step can be executed (all dependencies satisfied)
-      return unless workflow_step.abstract_workflow_step.depends_on.all? { |dep| dep.to_s.in? completed_step_names }
+      return unless workflow_step.abstract_workflow_step.depends_on.all? { |dep| dep.to_s.in? completed_or_skipped_step_names }
 
       # Check if workflow step can be skipped
       return workflow_step.update!(state: "skipped", completed_at: Time.zone.now) if workflow_step.abstract_workflow_step.skip?(workflow, *, **)
