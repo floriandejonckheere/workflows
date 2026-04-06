@@ -23,3 +23,17 @@ class EmailCampaignDispatchWorkflow < Workflows::Workflow
          depends_on: [:validate_email_list, :prepare_email_content]
   end
 end
+
+# == Schema Information
+#
+# Table name: workflows
+# Database name: primary
+#
+#  id           :integer          not null, primary key
+#  completed_at :datetime
+#  failed_at    :datetime
+#  state        :string           default("pending"), not null
+#  type         :string           not null
+#  created_at   :datetime         not null
+#  updated_at   :datetime         not null
+#
