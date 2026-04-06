@@ -26,7 +26,7 @@ module Workflows
          validate: true
 
     def all_workflow_steps_completed_or_skipped?
-      workflow_steps.any? && workflow_steps.all? { |step| step.state.in? ["completed", "skipped"] }
+      workflow_steps.all? { |step| step.state.in? ["completed", "skipped"] }
     end
 
     def any_workflow_step_failed?
