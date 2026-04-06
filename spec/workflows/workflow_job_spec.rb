@@ -3,7 +3,7 @@
 RSpec.describe Workflows::WorkflowJob do
   subject(:job) { described_class.new }
 
-  let(:workflow) { create(:workflow, type: EmailCampaignDispatchWorkflow.name) }
+  let(:workflow) { create(:workflow, :email_campaign_dispatch) }
 
   describe "#perform" do
     ["pending", "processing"].each do |state|
@@ -40,7 +40,7 @@ RSpec.describe Workflows::WorkflowJob do
     end
 
     context "when the workflow is completed" do
-      let(:workflow) { create(:workflow, :completed, type: EmailCampaignDispatchWorkflow.name) }
+      let(:workflow) { create(:workflow, :email_campaign_dispatch, :completed) }
 
       it "does not change the workflow state" do
         expect { job.perform(workflow) }
@@ -54,7 +54,7 @@ RSpec.describe Workflows::WorkflowJob do
     end
 
     context "when the workflow is failed" do
-      let(:workflow) { create(:workflow, :failed, type: EmailCampaignDispatchWorkflow.name) }
+      let(:workflow) { create(:workflow, :email_campaign_dispatch, :failed) }
 
       it "does not change the workflow state" do
         expect { job.perform(workflow) }

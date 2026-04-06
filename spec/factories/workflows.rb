@@ -52,5 +52,37 @@ FactoryBot.define do
       state { "failed" }
       failed_at { Time.zone.now }
     end
+
+    trait :video_processing do
+      type { VideoProcessingWorkflow.name }
+    end
+
+    trait :checkout do
+      type { CheckoutWorkflow.name }
+    end
+
+    trait :thumbnail_generation do
+      type { ThumbnailGenerationWorkflow.name }
+    end
+
+    trait :email_campaign_dispatch do
+      type { EmailCampaignDispatchWorkflow.name }
+    end
+
+    trait :data_ingestion_pipeline do
+      type { DataIngestionPipelineWorkflow.name }
+    end
+
+    trait :document_processing do
+      type { DocumentProcessingWorkflow.name }
+    end
+
+    trait :order_fulfillment do
+      type { OrderFulfillmentWorkflow.name }
+    end
+
+    trait :video_reencoding do
+      type { VideoReencodingWorkflow.name }
+    end
   end
 end

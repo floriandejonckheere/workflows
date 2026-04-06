@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe Workflows::DSL::Workflow do
-  subject(:workflow) { create(:workflow, type: VideoProcessingWorkflow.name) }
+  subject(:workflow) { create(:workflow, :video_processing) }
 
   describe "callbacks" do
     it "creates workflow steps after creation" do
