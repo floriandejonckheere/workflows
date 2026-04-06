@@ -32,17 +32,17 @@ module Workflows
       workflow
         .update!(state: "processing", completed_at: nil, failed_at: nil)
 
-      # Find all completed step names
-      completed_step_names = workflow
+      # Find all completed or skipped step names
+      completed_or_skipped_step_names = workflow
         .workflow_steps
-        .completed
+        .where(state: ["completed", "skipped"])
         .map(&:name)
 
       # Perform eligible steps (all of its dependencies are satisfied)
       workflow
         .workflow_steps
         .pending
-        .select { |step| step.abstract_workflow_step.depends_on.all? { |dep| dep.to_s.in? completed_step_names } }
+        .select { |step| step.abstract_workflow_step.depends_on.all? { |dep| dep.to_s.in? completed_or_skipped_step_names } }
         .select { |step| WorkflowStepJob.perform_later(workflow, step, *, **) }
       # TODO: use overridable job class
       # TODO: schedule in bulk

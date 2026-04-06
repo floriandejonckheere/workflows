@@ -34,7 +34,7 @@ RSpec.describe Workflows::WorkflowJob do
     end
   end
 
-  let(:workflow) { create(:workflow, :email_campaign_dispatch, type: workflow_class.name) }
+  let(:workflow) { create(:workflow, type: workflow_class.name) }
 
   before do
     stub_const("Step", step_class)
@@ -73,6 +73,18 @@ RSpec.describe Workflows::WorkflowJob do
             .with(workflow, workflow.workflow_steps.find_by(name: "first"), "argument_one", argument: "two")
         end
 
+        context "when some workflow steps are completed or skipped" do
+          it "enqueues workflow step jobs" do
+            workflow.workflow_steps.find_by(name: "first").update!(state: "completed")
+            workflow.workflow_steps.find_by(name: "second").update!(state: "skipped")
+
+            expect { job.perform(workflow) }
+              .to have_enqueued_job(Workflows::WorkflowStepJob)
+              .exactly(:once)
+              .with(workflow, workflow.workflow_steps.find_by(name: "third"))
+          end
+        end
+
         context "when any workflow step is failed" do
           it "changes the workflow state to failed" do
             workflow.workflow_steps.find_by(name: "first").update!(state: "completed")
@@ -105,7 +117,7 @@ RSpec.describe Workflows::WorkflowJob do
     end
 
     context "when the workflow is completed" do
-      let(:workflow) { create(:workflow, :email_campaign_dispatch, :completed) }
+      let(:workflow) { create(:workflow, :completed, type: workflow_class.name) }
 
       it "does not change the workflow state" do
         expect { job.perform(workflow) }
@@ -119,7 +131,7 @@ RSpec.describe Workflows::WorkflowJob do
     end
 
     context "when the workflow is failed" do
-      let(:workflow) { create(:workflow, :email_campaign_dispatch, :failed) }
+      let(:workflow) { create(:workflow, :failed, type: workflow_class.name) }
 
       it "does not change the workflow state" do
         expect { job.perform(workflow) }
