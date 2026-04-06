@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 ##
-# Simple, linear workflow
+# Simple, linear workflow (no namespace)
 #
 # validate_format
 # └── extract_metadata
