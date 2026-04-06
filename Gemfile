@@ -8,6 +8,9 @@ gemspec
 # Add annotations to Rails models and route files [https://github.com/drwl/annotaterb]
 gem "annotaterb"
 
+# Modify your ENV [https://github.com/thoughtbot/climate_control]
+gem "climate_control"
+
 # Ruby debugger [https://github.com/ruby/debug]
 gem "debug"
 

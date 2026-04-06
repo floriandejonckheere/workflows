@@ -89,6 +89,7 @@ GEM
     base64 (0.3.0)
     bigdecimal (4.0.1)
     builder (3.3.0)
+    climate_control (1.2.0)
     concurrent-ruby (1.3.6)
     connection_pool (3.0.2)
     crass (1.0.6)
@@ -336,6 +337,7 @@ PLATFORMS
 
 DEPENDENCIES
   annotaterb
+  climate_control
   debug
   factory_bot
   factory_bot_rails
