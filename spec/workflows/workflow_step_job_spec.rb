@@ -56,224 +56,24 @@ RSpec.describe Workflows::WorkflowStepJob do
     stub_const("Workflow", workflow_class)
   end
 
-  describe "state transitions" do
-    context "when the workflow step is pending" do
-      before { workflow_step.update!(state: "pending") }
+  ["completed", "failed"].each do |state|
+    context "when the step is already #{state}" do
+      before { workflow_step.update!(state:) }
 
-      it "changes the workflow step status to completed on success" do
-        expect { job.perform(workflow, workflow_step) }
-          .to change { workflow_step.reload.state }
-          .from("pending").to("completed")
-
-        expect(workflow_step.completed_at).to be_present
-        expect(workflow_step.failed_at).to be_nil
-      end
-
-      it "changes the workflow step status to failed on failure" do
-        allow(workflow_step)
-          .to receive(:call)
-          .and_raise ArgumentError, "This is an error message"
-
-        expect { expect { job.perform(workflow, workflow_step) }.to raise_error ArgumentError }
-          .to change { workflow_step.reload.state }
-          .from("pending").to("failed")
-
-        expect(workflow_step.completed_at).to be_nil
-        expect(workflow_step.failed_at).to be_present
-        expect(workflow_step.error_class).to eq "ArgumentError"
-        expect(workflow_step.error_message).to eq "This is an error message"
-      end
-
-      it "enqueues a workflow job" do
-        expect { job.perform(workflow, workflow_step) }
-          .to have_enqueued_job(Workflows::WorkflowJob)
-          .exactly(:once)
-          .with(workflow)
-      end
-
-      it "passes arguments to the workflow job" do
-        expect { job.perform(workflow, workflow_step, "argument_one", argument: "two") }
-          .to have_enqueued_job(Workflows::WorkflowJob)
-          .exactly(:once)
-          .with(workflow, "argument_one", argument: "two")
-      end
-
-      context "when a condition is specified" do
-        describe "condition passed as symbol" do
-          let(:workflow_step) { workflow.workflow_steps.find_by(name: "second") }
-
-          it "changes the workflow step status to skipped if condition returns false" do
-            workflow.workflow_steps.find_by(name: "first").update!(state: "completed")
-
-            ClimateControl.modify SECOND: "0" do
-              expect { job.perform(workflow, workflow_step) }
-                .to change { workflow_step.reload.state }
-                .from("pending").to("skipped")
-
-              expect(workflow_step.completed_at).to be_present
-              expect(workflow_step.failed_at).to be_nil
-            end
-          end
-
-          it "does not change the workflow step status to skipped if condition returns true" do
-            workflow.workflow_steps.find_by(name: "first").update!(state: "completed")
-
-            ClimateControl.modify SECOND: "1" do
-              expect { job.perform(workflow, workflow_step) }
-                .to change { workflow_step.reload.state }
-                .from("pending").to("completed")
-            end
-          end
-        end
-
-        describe "condition passed as proc" do
-          let(:workflow_step) { workflow.workflow_steps.find_by(name: "fourth") }
-
-          it "changes the workflow step status to skipped if condition returns false" do
-            workflow.workflow_steps.find_by(name: "third").update!(state: "completed")
-
-            expect { job.perform(workflow, workflow_step, fourth: false) }
-              .to change { workflow_step.reload.state }
-              .from("pending").to("skipped")
-
-            expect(workflow_step.completed_at).to be_present
-            expect(workflow_step.failed_at).to be_nil
-          end
-
-          it "does not change the workflow step status to skipped if condition returns true" do
-            workflow.workflow_steps.find_by(name: "third").update!(state: "completed")
-
-            expect { job.perform(workflow, workflow_step, fourth: true) }
-              .to change { workflow_step.reload.state }
-              .from("pending").to("completed")
-          end
-        end
-      end
-    end
-
-    context "when the workflow step is processing" do
-      before { workflow_step.update!(state: "processing") }
-
-      it "changes the workflow step status to completed on success" do
-        expect { job.perform(workflow, workflow_step) }
-          .to change { workflow_step.reload.state }
-          .from("processing").to("completed")
-
-        expect(workflow_step.completed_at).to be_present
-        expect(workflow_step.failed_at).to be_nil
-      end
-
-      it "changes the workflow step status to failed on failure" do
-        allow(workflow_step)
-          .to receive(:call)
-          .and_raise ArgumentError, "This is an error message"
-
-        expect { expect { job.perform(workflow, workflow_step) }.to raise_error ArgumentError }
-          .to change { workflow_step.reload.state }
-          .from("processing").to("failed")
-
-        expect(workflow_step.completed_at).to be_nil
-        expect(workflow_step.failed_at).to be_present
-        expect(workflow_step.error_class).to eq "ArgumentError"
-        expect(workflow_step.error_message).to eq "This is an error message"
-      end
-
-      it "enqueues a workflow job" do
-        expect { job.perform(workflow, workflow_step) }
-          .to have_enqueued_job(Workflows::WorkflowJob)
-          .exactly(:once)
-          .with(workflow)
-      end
-
-      it "passes arguments to the workflow job" do
-        expect { job.perform(workflow, workflow_step, "argument_one", argument: "two") }
-          .to have_enqueued_job(Workflows::WorkflowJob)
-          .exactly(:once)
-          .with(workflow, "argument_one", argument: "two")
-      end
-
-      context "when a condition is specified" do
-        describe "condition passed as symbol" do
-          let(:workflow_step) { workflow.workflow_steps.find_by(name: "second") }
-
-          it "changes the workflow step status to skipped if condition returns false" do
-            workflow.workflow_steps.find_by(name: "first").update!(state: "completed")
-
-            ClimateControl.modify SECOND: "0" do
-              expect { job.perform(workflow, workflow_step) }
-                .to change { workflow_step.reload.state }
-                .from("processing").to("skipped")
-
-              expect(workflow_step.completed_at).to be_present
-              expect(workflow_step.failed_at).to be_nil
-            end
-          end
-
-          it "does not change the workflow step status to skipped if condition returns true" do
-            workflow.workflow_steps.find_by(name: "first").update!(state: "completed")
-
-            ClimateControl.modify SECOND: "1" do
-              expect { job.perform(workflow, workflow_step) }
-                .to change { workflow_step.reload.state }
-                .from("processing").to("completed")
-            end
-          end
-        end
-
-        describe "condition passed as proc" do
-          let(:workflow_step) { workflow.workflow_steps.find_by(name: "fourth") }
-
-          it "changes the workflow step status to skipped if condition returns false" do
-            workflow.workflow_steps.find_by(name: "third").update!(state: "completed")
-
-            expect { job.perform(workflow, workflow_step, fourth: false) }
-              .to change { workflow_step.reload.state }
-              .from("processing").to("skipped")
-
-            expect(workflow_step.completed_at).to be_present
-            expect(workflow_step.failed_at).to be_nil
-          end
-
-          it "does not change the workflow step status to skipped if condition returns true" do
-            workflow.workflow_steps.find_by(name: "third").update!(state: "completed")
-
-            expect { job.perform(workflow, workflow_step, fourth: true) }
-              .to change { workflow_step.reload.state }
-              .from("processing").to("completed")
-          end
-        end
-      end
-    end
-
-    context "when the workflow step is completed" do
-      before { workflow_step.update!(state: "completed") }
-
-      it "does not change the workflow step state" do
+      it "does not change the step state" do
         expect { job.perform(workflow, workflow_step) }
           .not_to(change { workflow_step.reload.state })
       end
 
-      it "enqueues a workflow job" do
-        expect { job.perform(workflow, workflow_step) }
-          .to have_enqueued_job(Workflows::WorkflowJob)
-          .exactly(:once)
-          .with(workflow)
-      end
+      it "does not execute the step" do
+        allow(workflow_step)
+          .to receive(:call)
+          .and_call_original
 
-      it "passes arguments to the workflow job" do
-        expect { job.perform(workflow, workflow_step, "argument_one", argument: "two") }
-          .to have_enqueued_job(Workflows::WorkflowJob)
-          .exactly(:once)
-          .with(workflow, "argument_one", argument: "two")
-      end
-    end
+        job.perform(workflow, workflow_step)
 
-    context "when the workflow step is failed" do
-      before { workflow_step.update!(state: "failed") }
-
-      it "does not change the workflow step state" do
-        expect { job.perform(workflow, workflow_step) }
-          .not_to(change { workflow_step.reload.state })
+        expect(workflow_step)
+          .not_to have_received(:call)
       end
 
       it "enqueues a workflow job" do
@@ -292,8 +92,66 @@ RSpec.describe Workflows::WorkflowStepJob do
     end
   end
 
-  describe "step executing" do
-    it "executes the step" do
+  ["pending", "processing"].each do |initial_state|
+    context "when the step is #{initial_state}" do
+      before { workflow_step.update!(state: initial_state) }
+
+      it "transitions to completed on success" do
+        expect { job.perform(workflow, workflow_step) }
+          .to change { workflow_step.reload.state }
+          .from(initial_state).to("completed")
+
+        expect(workflow_step.completed_at).to be_present
+        expect(workflow_step.failed_at).to be_nil
+      end
+
+      it "transitions to failed on failure" do
+        allow(workflow_step)
+          .to receive(:call)
+          .and_raise ArgumentError, "This is an error message"
+
+        expect { expect { job.perform(workflow, workflow_step) }.to raise_error ArgumentError }
+          .to change { workflow_step.reload.state }
+          .from(initial_state).to("failed")
+
+        expect(workflow_step.completed_at).to be_nil
+        expect(workflow_step.failed_at).to be_present
+        expect(workflow_step.error_class).to eq "ArgumentError"
+        expect(workflow_step.error_message).to eq "This is an error message"
+      end
+
+      it "passes arguments to the step" do
+        allow(workflow_step)
+          .to receive(:call)
+          .and_call_original
+
+        job.perform(workflow, workflow_step, "argument_one", argument: "two")
+
+        expect(workflow_step)
+          .to have_received(:call)
+          .with("argument_one", argument: "two")
+      end
+
+      it "enqueues a workflow job" do
+        expect { job.perform(workflow, workflow_step) }
+          .to have_enqueued_job(Workflows::WorkflowJob)
+          .exactly(:once)
+          .with(workflow)
+      end
+
+      it "passes arguments to the workflow job" do
+        expect { job.perform(workflow, workflow_step, "argument_one", argument: "two") }
+          .to have_enqueued_job(Workflows::WorkflowJob)
+          .exactly(:once)
+          .with(workflow, "argument_one", argument: "two")
+      end
+    end
+  end
+
+  context "when dependencies are not satisfied" do
+    let(:workflow_step) { workflow.workflow_steps.find_by(name: "third") }
+
+    it "does not execute the step" do
       allow(workflow_step)
         .to receive(:call)
         .and_call_original
@@ -301,25 +159,17 @@ RSpec.describe Workflows::WorkflowStepJob do
       job.perform(workflow, workflow_step)
 
       expect(workflow_step)
-        .to have_received(:call)
+        .not_to have_received(:call)
     end
+  end
 
-    it "passes arguments to the step" do
-      allow(workflow_step)
-        .to receive(:call)
-        .and_call_original
+  context "when a dependency is skipped" do
+    let(:workflow_step) { workflow.workflow_steps.find_by(name: "second") }
 
-      job.perform(workflow, workflow_step, "argument_one", argument: "two")
+    before { workflow.workflow_steps.find_by(name: "first").update!(state: "skipped") }
 
-      expect(workflow_step)
-        .to have_received(:call)
-        .with("argument_one", argument: "two")
-    end
-
-    context "when the workflow step is completed" do
-      it "does not execute the step" do
-        workflow_step.update!(state: "completed")
-
+    it "executes the step" do
+      ClimateControl.modify SECOND: "1" do
         allow(workflow_step)
           .to receive(:call)
           .and_call_original
@@ -327,46 +177,29 @@ RSpec.describe Workflows::WorkflowStepJob do
         job.perform(workflow, workflow_step)
 
         expect(workflow_step)
-          .not_to have_received(:call)
+          .to have_received(:call)
       end
     end
+  end
 
-    context "when the workflow step is failed" do
-      it "does not execute the step" do
-        workflow_step.update!(state: "failed")
-
-        allow(workflow_step)
-          .to receive(:call)
-          .and_call_original
-
-        job.perform(workflow, workflow_step)
-
-        expect(workflow_step)
-          .not_to have_received(:call)
-      end
-    end
-
-    context "when not all of the dependencies are complete" do
-      let(:workflow_step) { workflow.workflow_steps.find_by(name: "third") }
-
-      it "does not execute the step" do
-        allow(workflow_step)
-          .to receive(:call)
-          .and_call_original
-
-        job.perform(workflow, workflow_step)
-
-        expect(workflow_step)
-          .not_to have_received(:call)
-      end
-    end
-
-    context "when some dependencies are skipped" do
+  context "when a condition is specified" do
+    context "as a symbol" do
       let(:workflow_step) { workflow.workflow_steps.find_by(name: "second") }
 
-      it "executes the step" do
-        workflow.workflow_steps.find_by(name: "first").update!(state: "skipped")
+      before { workflow.workflow_steps.find_by(name: "first").update!(state: "completed") }
 
+      it "skips the step when the skip condition is met" do
+        ClimateControl.modify SECOND: "0" do
+          expect { job.perform(workflow, workflow_step) }
+            .to change { workflow_step.reload.state }
+            .from("pending").to("skipped")
+
+          expect(workflow_step.completed_at).to be_present
+          expect(workflow_step.failed_at).to be_nil
+        end
+      end
+
+      it "executes the step when the skip condition is not met" do
         ClimateControl.modify SECOND: "1" do
           allow(workflow_step)
             .to receive(:call)
@@ -374,75 +207,34 @@ RSpec.describe Workflows::WorkflowStepJob do
 
           job.perform(workflow, workflow_step)
 
-          expect(workflow_step)
-            .to have_received(:call)
+          expect(workflow_step).to have_received(:call)
         end
       end
     end
 
-    context "when a condition is specified" do
-      describe "condition passed as symbol" do
-        let(:workflow_step) { workflow.workflow_steps.find_by(name: "second") }
+    context "as a proc" do
+      let(:workflow_step) { workflow.workflow_steps.find_by(name: "fourth") }
 
-        it "does not execute the step if condition returns false" do
-          workflow.workflow_steps.find_by(name: "first").update!(state: "completed")
+      before { workflow.workflow_steps.find_by(name: "third").update!(state: "completed") }
 
-          ClimateControl.modify SECOND: "0" do
-            allow(workflow_step)
-              .to receive(:call)
-              .and_call_original
+      it "skips the step when the skip condition is met" do
+        expect { job.perform(workflow, workflow_step, fourth: false) }
+          .to change { workflow_step.reload.state }
+          .from("pending").to("skipped")
 
-            job.perform(workflow, workflow_step)
-
-            expect(workflow_step)
-              .not_to have_received(:call)
-          end
-        end
-
-        it "executes the step if condition returns true" do
-          workflow.workflow_steps.find_by(name: "first").update!(state: "completed")
-
-          ClimateControl.modify SECOND: "1" do
-            allow(workflow_step)
-              .to receive(:call)
-              .and_call_original
-
-            job.perform(workflow, workflow_step)
-
-            expect(workflow_step)
-              .to have_received(:call)
-          end
-        end
+        expect(workflow_step.completed_at).to be_present
+        expect(workflow_step.failed_at).to be_nil
       end
 
-      describe "condition passed as proc" do
-        let(:workflow_step) { workflow.workflow_steps.find_by(name: "fourth") }
+      it "executes the step when the skip condition is not met" do
+        allow(workflow_step)
+          .to receive(:call)
+          .and_call_original
 
-        it "does not execute the step if condition returns false" do
-          workflow.workflow_steps.find_by(name: "third").update!(state: "completed")
+        job.perform(workflow, workflow_step, fourth: true)
 
-          allow(workflow_step)
-            .to receive(:call)
-            .and_call_original
-
-          job.perform(workflow, workflow_step, fourth: false)
-
-          expect(workflow_step)
-            .not_to have_received(:call)
-        end
-
-        it "executes the step if condition returns true" do
-          workflow.workflow_steps.find_by(name: "third").update!(state: "completed")
-
-          allow(workflow_step)
-            .to receive(:call)
-            .and_call_original
-
-          job.perform(workflow, workflow_step, fourth: true)
-
-          expect(workflow_step)
-            .to have_received(:call)
-        end
+        expect(workflow_step)
+          .to have_received(:call)
       end
     end
   end
