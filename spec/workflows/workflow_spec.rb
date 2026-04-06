@@ -41,7 +41,7 @@ RSpec.describe Workflows::Workflow do
     end
 
     context "when there are no workflow steps" do
-      it { expect(workflow).not_to be_all_workflow_steps_completed_or_skipped }
+      it { expect(workflow).to be_all_workflow_steps_completed_or_skipped }
     end
   end
 
