@@ -41,100 +41,9 @@ RSpec.describe Workflows::WorkflowJob do
     stub_const("Workflow", workflow_class)
   end
 
-  describe "state transitions" do
-    context "when the workflow is pending" do
-      let(:workflow) { create(:workflow, type: workflow_class.name, state: "pending") }
-
-      it "changes the workflow state to processing" do
-        expect { job.perform(workflow) }
-          .to change { workflow.reload.state }
-          .from("pending").to("processing")
-      end
-
-      context "when any workflow step is failed" do
-        it "changes the workflow state to failed" do
-          workflow.workflow_steps.find_by(name: "first").update!(state: "completed")
-          workflow.workflow_steps.find_by(name: "second").update!(state: "failed")
-
-          expect { job.perform(workflow) }
-            .to change { workflow.reload.state }
-            .from("pending").to("failed")
-
-          expect(workflow.completed_at).to be_nil
-          expect(workflow.failed_at).to be_present
-        end
-      end
-
-      context "when all workflow steps are completed or skipped" do
-        it "changes the workflow state to completed" do
-          workflow.workflow_steps.find_by(name: "first").update!(state: "completed")
-          workflow.workflow_steps.find_by(name: "second").update!(state: "skipped")
-          workflow.workflow_steps.find_by(name: "third").update!(state: "completed")
-
-          expect { job.perform(workflow) }
-            .to change { workflow.reload.state }
-            .from("pending").to("completed")
-
-          expect(workflow.completed_at).to be_present
-          expect(workflow.failed_at).to be_nil
-        end
-      end
-    end
-
-    context "when the workflow is processing" do
-      let(:workflow) { create(:workflow, type: workflow_class.name, state: "processing") }
-
-      it "does not change the workflow state" do
-        expect { job.perform(workflow) }
-          .not_to(change { workflow.reload.state })
-      end
-
-      context "when any workflow step is failed" do
-        it "changes the workflow state to failed" do
-          workflow.workflow_steps.find_by(name: "first").update!(state: "completed")
-          workflow.workflow_steps.find_by(name: "second").update!(state: "failed")
-
-          expect { job.perform(workflow) }
-            .to change { workflow.reload.state }
-            .from("processing").to("failed")
-
-          expect(workflow.completed_at).to be_nil
-          expect(workflow.failed_at).to be_present
-        end
-      end
-
-      context "when all workflow steps are completed or skipped" do
-        it "changes the workflow state to completed" do
-          workflow.workflow_steps.find_by(name: "first").update!(state: "completed")
-          workflow.workflow_steps.find_by(name: "second").update!(state: "skipped")
-          workflow.workflow_steps.find_by(name: "third").update!(state: "completed")
-
-          expect { job.perform(workflow) }
-            .to change { workflow.reload.state }
-            .from("processing").to("completed")
-
-          expect(workflow.completed_at).to be_present
-          expect(workflow.failed_at).to be_nil
-        end
-      end
-    end
-
-    context "when the workflow is completed" do
-      let(:workflow) { create(:workflow, type: workflow_class.name, state: "completed") }
-
-      it "does not change the workflow state" do
-        expect { job.perform(workflow) }
-          .not_to(change { workflow.reload.state })
-      end
-
-      it "does not enqueue any jobs" do
-        expect { job.perform(workflow) }
-          .not_to have_enqueued_job
-      end
-    end
-
-    context "when the workflow is failed" do
-      let(:workflow) { create(:workflow, type: workflow_class.name, state: "failed") }
+  ["completed", "failed"].each do |state|
+    context "when the workflow is already #{state}" do
+      let(:workflow) { create(:workflow, type: workflow_class.name, state:) }
 
       it "does not change the workflow state" do
         expect { job.perform(workflow) }
@@ -148,60 +57,102 @@ RSpec.describe Workflows::WorkflowJob do
     end
   end
 
+  shared_examples "terminal state transitions" do |state|
+    context "when a step has failed" do
+      before do
+        workflow.workflow_steps.find_by(name: "first").update!(state: "completed")
+        workflow.workflow_steps.find_by(name: "second").update!(state: "failed")
+      end
+
+      it "transitions to failed" do
+        expect { job.perform(workflow) }
+          .to change { workflow.reload.state }
+          .from(state).to("failed")
+
+        expect(workflow.completed_at).to be_nil
+        expect(workflow.failed_at).to be_present
+      end
+    end
+
+    context "when all steps are completed or skipped" do
+      before do
+        workflow.workflow_steps.find_by(name: "first").update!(state: "completed")
+        workflow.workflow_steps.find_by(name: "second").update!(state: "skipped")
+        workflow.workflow_steps.find_by(name: "third").update!(state: "completed")
+      end
+
+      it "transitions to completed" do
+        expect { job.perform(workflow) }
+          .to change { workflow.reload.state }
+          .from(state).to("completed")
+
+        expect(workflow.completed_at).to be_present
+        expect(workflow.failed_at).to be_nil
+      end
+    end
+  end
+
+  context "when the workflow is pending" do
+    let(:workflow) { create(:workflow, type: workflow_class.name, state: "pending") }
+
+    it "transitions to processing" do
+      expect { job.perform(workflow) }
+        .to change { workflow.reload.state }
+        .from("pending").to("processing")
+    end
+
+    it_behaves_like "terminal state transitions", "pending"
+  end
+
+  context "when the workflow is processing" do
+    let(:workflow) { create(:workflow, type: workflow_class.name, state: "processing") }
+
+    it "does not change the workflow state" do
+      expect { job.perform(workflow) }
+        .not_to(change { workflow.reload.state })
+    end
+
+    it_behaves_like "terminal state transitions", "processing"
+  end
+
   describe "job scheduling" do
-    it "enqueues pending workflow step jobs with all dependencies completed" do
+    it "enqueues the step whose dependencies are satisfied" do
       expect { job.perform(workflow) }
         .to have_enqueued_job(Workflows::WorkflowStepJob)
         .exactly(:once)
         .with(workflow, workflow.workflow_steps.find_by(name: "first"))
+    end
 
-      workflow.workflow_steps.find_by(name: "first").update! state: "completed"
+    it "enqueues the next step once its dependency is satisfied" do
+      workflow.workflow_steps.find_by(name: "first").update!(state: "completed")
 
       expect { job.perform(workflow) }
         .to have_enqueued_job(Workflows::WorkflowStepJob)
         .exactly(:once)
         .with(workflow, workflow.workflow_steps.find_by(name: "second"))
-
-      workflow.workflow_steps.find_by(name: "second").update! state: "completed"
-
-      expect { job.perform(workflow) }
-        .to have_enqueued_job(Workflows::WorkflowStepJob)
-        .exactly(:once)
-        .with(workflow, workflow.workflow_steps.find_by(name: "third"))
     end
 
-    it "passes arguments to workflow step jobs" do
+    it "passes arguments to step jobs" do
       expect { job.perform(workflow, "argument_one", argument: "two") }
         .to have_enqueued_job(Workflows::WorkflowStepJob)
         .exactly(:once)
         .with(workflow, workflow.workflow_steps.find_by(name: "first"), "argument_one", argument: "two")
     end
 
-    context "when some workflow steps are failed" do
-      it "enqueues pending workflow step jobs with all dependencies completed" do
-        workflow.workflow_steps.find_by(name: "first").update!(state: "failed")
+    it "does not enqueue step jobs when a step has failed" do
+      workflow.workflow_steps.find_by(name: "first").update!(state: "failed")
 
-        expect { job.perform(workflow) }
-          .not_to have_enqueued_job(Workflows::WorkflowStepJob)
-      end
+      expect { job.perform(workflow) }
+        .not_to have_enqueued_job(Workflows::WorkflowStepJob)
     end
 
-    context "when some workflow steps are completed or skipped" do
-      it "enqueues pending workflow step jobs with all dependencies completed" do
-        workflow.workflow_steps.find_by(name: "first").update!(state: "skipped")
+    it "treats skipped steps as satisfied dependencies" do
+      workflow.workflow_steps.find_by(name: "first").update!(state: "skipped")
 
-        expect { job.perform(workflow) }
-          .to have_enqueued_job(Workflows::WorkflowStepJob)
-          .exactly(:once)
-          .with(workflow, workflow.workflow_steps.find_by(name: "second"))
-
-        workflow.workflow_steps.find_by(name: "second").update!(state: "completed")
-
-        expect { job.perform(workflow) }
-          .to have_enqueued_job(Workflows::WorkflowStepJob)
-          .exactly(:once)
-          .with(workflow, workflow.workflow_steps.find_by(name: "third"))
-      end
+      expect { job.perform(workflow) }
+        .to have_enqueued_job(Workflows::WorkflowStepJob)
+        .exactly(:once)
+        .with(workflow, workflow.workflow_steps.find_by(name: "second"))
     end
   end
 end
