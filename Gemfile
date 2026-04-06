@@ -5,6 +5,9 @@ source "https://rubygems.org"
 # Specify your gem's dependencies in workflows.gemspec
 gemspec
 
+# Add annotations to Rails models and route files [https://github.com/drwl/annotaterb]
+gem "annotaterb"
+
 # Ruby debugger [https://github.com/ruby/debug]
 gem "debug"
 
