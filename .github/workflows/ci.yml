@@ -23,7 +23,7 @@ jobs:
           fetch-depth: 1
 
       - name: Set up Ruby
-        uses: ruby/setup-ruby@ba696adf55506673e48342a66e30f1f53cadeae0 # v1.288.0
+        uses: ruby/setup-ruby@e65c17d16e57e481586a6a5a0282698790062f92 # v1.288.0
         with:
           ruby-version: 4.0.1
           bundler-cache: true
@@ -54,7 +54,7 @@ jobs:
           fetch-depth: 1
 
       - name: Set up Ruby
-        uses: ruby/setup-ruby@ba696adf55506673e48342a66e30f1f53cadeae0 # v1.288.0
+        uses: ruby/setup-ruby@e65c17d16e57e481586a6a5a0282698790062f92 # v1.288.0
         with:
           ruby-version: 4.0.1
           bundler-cache: true
