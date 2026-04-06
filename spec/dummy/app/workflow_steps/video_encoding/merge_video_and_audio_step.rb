@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-module VideoReencoding
-  class ReencodeVideoStep < Workflows::WorkflowStep
+module VideoEncoding
+  class MergeVideoAndAudioStep < Workflows::WorkflowStep
     def call(...)
       # ...
     end

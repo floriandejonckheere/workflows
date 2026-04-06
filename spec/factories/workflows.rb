@@ -81,8 +81,8 @@ FactoryBot.define do
       type { OrderFulfillmentWorkflow.name }
     end
 
-    trait :video_reencoding do
-      type { VideoReencodingWorkflow.name }
+    trait :video_encoding do
+      type { VideoEncodingWorkflow.name }
     end
   end
 end

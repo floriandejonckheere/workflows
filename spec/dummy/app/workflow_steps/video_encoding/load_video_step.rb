@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-module VideoReencoding
-  class ExtractAudioStep < Workflows::WorkflowStep
+module VideoEncoding
+  class LoadVideoStep < Workflows::WorkflowStep
     def call(...)
       # ...
     end
