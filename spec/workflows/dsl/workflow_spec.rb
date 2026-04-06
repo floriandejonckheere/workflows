@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe Workflows::DSL::Workflow do
-  subject(:workflow) { create(:workflow, type: WorkflowOne.name) }
+  subject(:workflow) { create(:workflow, type: VideoProcessingWorkflow.name) }
 
   describe "callbacks" do
     it "creates workflow steps after creation" do
@@ -9,22 +9,22 @@ RSpec.describe Workflows::DSL::Workflow do
         .to change(Workflows::WorkflowStep, :count)
         .by(5)
 
-      step_one, step_two, step_three, step_four, step_five = workflow.workflow_steps
+      validate_format, extract_metadata, generate_thumbnails, upload_to_cdn, publish_video = workflow.workflow_steps
 
-      expect(step_one).to be_a OneStep
-      expect(step_one.name).to eq "one"
+      expect(validate_format).to be_a ValidateFormatStep
+      expect(validate_format.name).to eq "validate_format"
 
-      expect(step_two).to be_a TwoStep
-      expect(step_two.name).to eq "two"
+      expect(extract_metadata).to be_a ExtractMetadataStep
+      expect(extract_metadata.name).to eq "extract_metadata"
 
-      expect(step_three).to be_a ThreeStep
-      expect(step_three.name).to eq "three"
+      expect(generate_thumbnails).to be_a GenerateThumbnailsStep
+      expect(generate_thumbnails.name).to eq "generate_thumbnails"
 
-      expect(step_four).to be_a FourStep
-      expect(step_four.name).to eq "four"
+      expect(upload_to_cdn).to be_a UploadToCdnStep
+      expect(upload_to_cdn.name).to eq "upload_to_cdn"
 
-      expect(step_five).to be_a OneStep
-      expect(step_five.name).to eq "five"
+      expect(publish_video).to be_a PublishVideoStep
+      expect(publish_video.name).to eq "publish_video"
     end
   end
 
@@ -84,39 +84,39 @@ RSpec.describe Workflows::DSL::Workflow do
     it "defines an abstract workflow step" do
       abstract_workflow = workflow.abstract_workflow
 
-      step_one = abstract_workflow.abstract_workflow_steps[:one]
-      expect(step_one).to be_a Workflows::AbstractWorkflowStep
-      expect(step_one.name).to eq :one
-      expect(step_one.depends_on).to be_empty
-      expect(step_one.type).to eq OneStep
+      validate_format = abstract_workflow.abstract_workflow_steps[:validate_format]
+      expect(validate_format).to be_a Workflows::AbstractWorkflowStep
+      expect(validate_format.name).to eq :validate_format
+      expect(validate_format.depends_on).to be_empty
+      expect(validate_format.type).to eq ValidateFormatStep
 
-      step_two = abstract_workflow.abstract_workflow_steps[:two]
-      expect(step_two).to be_a Workflows::AbstractWorkflowStep
-      expect(step_two.name).to eq :two
-      expect(step_two.depends_on).to contain_exactly(:one)
-      expect(step_two.type).to eq TwoStep
+      extract_metadata = abstract_workflow.abstract_workflow_steps[:extract_metadata]
+      expect(extract_metadata).to be_a Workflows::AbstractWorkflowStep
+      expect(extract_metadata.name).to eq :extract_metadata
+      expect(extract_metadata.depends_on).to contain_exactly(:validate_format)
+      expect(extract_metadata.type).to eq ExtractMetadataStep
 
-      step_three = abstract_workflow.abstract_workflow_steps[:three]
-      expect(step_three).to be_a Workflows::AbstractWorkflowStep
-      expect(step_three.name).to eq :three
-      expect(step_three.depends_on).to contain_exactly(:two)
-      expect(step_three.type).to eq ThreeStep
+      generate_thumbnails = abstract_workflow.abstract_workflow_steps[:generate_thumbnails]
+      expect(generate_thumbnails).to be_a Workflows::AbstractWorkflowStep
+      expect(generate_thumbnails.name).to eq :generate_thumbnails
+      expect(generate_thumbnails.depends_on).to contain_exactly(:extract_metadata)
+      expect(generate_thumbnails.type).to eq GenerateThumbnailsStep
 
-      step_four = abstract_workflow.abstract_workflow_steps[:four]
-      expect(step_four).to be_a Workflows::AbstractWorkflowStep
-      expect(step_four.name).to eq :four
-      expect(step_four.depends_on).to contain_exactly(:three)
-      expect(step_four.type).to eq FourStep
+      upload_to_cdn = abstract_workflow.abstract_workflow_steps[:upload_to_cdn]
+      expect(upload_to_cdn).to be_a Workflows::AbstractWorkflowStep
+      expect(upload_to_cdn.name).to eq :upload_to_cdn
+      expect(upload_to_cdn.depends_on).to contain_exactly(:generate_thumbnails)
+      expect(upload_to_cdn.type).to eq UploadToCdnStep
 
-      step_five = abstract_workflow.abstract_workflow_steps[:five]
-      expect(step_five).to be_a Workflows::AbstractWorkflowStep
-      expect(step_five.name).to eq :five
-      expect(step_five.depends_on).to contain_exactly(:four)
-      expect(step_five.type).to eq OneStep
+      publish_video = abstract_workflow.abstract_workflow_steps[:publish_video]
+      expect(publish_video).to be_a Workflows::AbstractWorkflowStep
+      expect(publish_video.name).to eq :publish_video
+      expect(publish_video.depends_on).to contain_exactly(:upload_to_cdn)
+      expect(publish_video.type).to eq PublishVideoStep
     end
 
     it "raises when a step is already defined" do
-      expect { WorkflowOne.step :one }
+      expect { VideoProcessingWorkflow.step :validate_format }
         .to raise_error ArgumentError
     end
   end

@@ -3,7 +3,7 @@
 RSpec.describe Workflows::WorkflowJob do
   subject(:job) { described_class.new }
 
-  let(:workflow) { create(:workflow, type: WorkflowThree.name) }
+  let(:workflow) { create(:workflow, type: EmailCampaignDispatchWorkflow.name) }
 
   describe "#perform" do
     ["pending", "processing"].each do |state|
@@ -27,20 +27,20 @@ RSpec.describe Workflows::WorkflowJob do
           expect { job.perform(workflow) }
             .to have_enqueued_job(Workflows::WorkflowStepJob)
             .exactly(:once)
-            .with(workflow, workflow.workflow_steps.find_by(name: "one"))
+            .with(workflow, workflow.workflow_steps.find_by(name: "load_recipients"))
         end
 
         it "passes arguments to workflow step jobs" do
           expect { job.perform(workflow, "argument_one", argument: "two") }
             .to have_enqueued_job(Workflows::WorkflowStepJob)
             .exactly(:once)
-            .with(workflow, workflow.workflow_steps.find_by(name: "one"), "argument_one", argument: "two")
+            .with(workflow, workflow.workflow_steps.find_by(name: "load_recipients"), "argument_one", argument: "two")
         end
       end
     end
 
     context "when the workflow is completed" do
-      let(:workflow) { create(:workflow, :completed, type: WorkflowThree.name) }
+      let(:workflow) { create(:workflow, :completed, type: EmailCampaignDispatchWorkflow.name) }
 
       it "does not change the workflow state" do
         expect { job.perform(workflow) }
@@ -54,7 +54,7 @@ RSpec.describe Workflows::WorkflowJob do
     end
 
     context "when the workflow is failed" do
-      let(:workflow) { create(:workflow, :failed, type: WorkflowThree.name) }
+      let(:workflow) { create(:workflow, :failed, type: EmailCampaignDispatchWorkflow.name) }
 
       it "does not change the workflow state" do
         expect { job.perform(workflow) }

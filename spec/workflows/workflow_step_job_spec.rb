@@ -3,8 +3,8 @@
 RSpec.describe Workflows::WorkflowStepJob do
   subject(:job) { described_class.new }
 
-  let(:workflow) { WorkflowThree.create! }
-  let(:workflow_step) { workflow.workflow_steps.find_by(name: "one") }
+  let(:workflow) { EmailCampaignDispatchWorkflow.create! }
+  let(:workflow_step) { workflow.workflow_steps.find_by(name: "load_recipients") }
 
   describe "#perform" do
     ["pending", "processing"].each do |state|
@@ -73,7 +73,7 @@ RSpec.describe Workflows::WorkflowStepJob do
         end
 
         context "when not all of the dependencies are complete" do
-          let(:workflow_step) { workflow.workflow_steps.find_by(name: "three") }
+          let(:workflow_step) { workflow.workflow_steps.find_by(name: "send_emails") }
 
           it "does not change the workflow step state" do
             expect { job.perform(workflow, workflow_step) }
