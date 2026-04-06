@@ -21,7 +21,7 @@ module Workflows
       end
 
       # Check if all the steps have been completed
-      if workflow.all_workflow_steps_completed?
+      if workflow.all_workflow_steps_completed_or_skipped?
         workflow
           .update!(state: "completed", completed_at: Time.zone.now)
 

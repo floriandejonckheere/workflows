@@ -17,8 +17,11 @@ module Workflows
         .completed
         .map(&:name)
 
-      # Check if workflow step can be executed
+      # Check if workflow step can be executed (all dependencies satisfied)
       return unless workflow_step.abstract_workflow_step.depends_on.all? { |dep| dep.to_s.in? completed_step_names }
+
+      # Check if workflow step can be skipped
+      return workflow_step.update!(state: "skipped", completed_at: Time.zone.now) if workflow_step.abstract_workflow_step.skip?(workflow, *, **)
 
       # Mark as processing
       workflow_step

@@ -36,13 +36,14 @@ module Workflows
           yield self.abstract_workflow = AbstractWorkflow.new(namespace:)
         end
 
-        def step(name, depends_on: [], type: nil)
+        def step(name, depends_on: [], condition: nil, type: nil)
           raise ArgumentError, "Step #{name} is already defined" if abstract_workflow.abstract_workflow_steps.key?(name)
 
           abstract_workflow.abstract_workflow_steps[name] = AbstractWorkflowStep.new(
             name,
             depends_on:,
             type:,
+            condition:,
             namespace: abstract_workflow.namespace,
           )
         end

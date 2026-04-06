@@ -15,11 +15,20 @@ RSpec.describe Workflows::Workflow do
     it { is_expected.to define_enum_for(:state).with_values(pending: "pending", processing: "processing", completed: "completed", failed: "failed").backed_by_column_of_type(:string) }
   end
 
-  describe "#all_workflow_steps_completed?" do
+  describe "#all_workflow_steps_completed_or_skipped?" do
     context "when all steps are completed" do
       before { create_list(:workflow_step, 2, :completed, workflow:) }
 
-      it { expect(workflow).to be_all_workflow_steps_completed }
+      it { expect(workflow).to be_all_workflow_steps_completed_or_skipped }
+    end
+
+    context "when some workflow steps are skipped" do
+      before do
+        create(:workflow_step, :completed, workflow:)
+        create(:workflow_step, :skipped, workflow:)
+      end
+
+      it { expect(workflow).to be_all_workflow_steps_completed_or_skipped }
     end
 
     context "when some workflow steps are not completed" do
@@ -28,11 +37,11 @@ RSpec.describe Workflows::Workflow do
         create(:workflow_step, workflow:)
       end
 
-      it { expect(workflow).not_to be_all_workflow_steps_completed }
+      it { expect(workflow).not_to be_all_workflow_steps_completed_or_skipped }
     end
 
     context "when there are no workflow steps" do
-      it { expect(workflow).not_to be_all_workflow_steps_completed }
+      it { expect(workflow).not_to be_all_workflow_steps_completed_or_skipped }
     end
   end
 

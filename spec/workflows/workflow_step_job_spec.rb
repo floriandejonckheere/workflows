@@ -3,8 +3,8 @@
 RSpec.describe Workflows::WorkflowStepJob do
   subject(:job) { described_class.new }
 
-  let(:workflow) { EmailCampaignDispatchWorkflow.create! }
-  let(:workflow_step) { workflow.workflow_steps.find_by(name: "load_recipients") }
+  let(:workflow) { VideoEncodingWorkflow.create! }
+  let(:workflow_step) { workflow.workflow_steps.find_by(name: "load_video") }
 
   describe "#perform" do
     ["pending", "processing"].each do |state|
@@ -73,7 +73,7 @@ RSpec.describe Workflows::WorkflowStepJob do
         end
 
         context "when not all of the dependencies are complete" do
-          let(:workflow_step) { workflow.workflow_steps.find_by(name: "send_emails") }
+          let(:workflow_step) { workflow.workflow_steps.find_by(name: "extract_audio") }
 
           it "does not change the workflow step state" do
             expect { job.perform(workflow, workflow_step) }
@@ -96,6 +96,54 @@ RSpec.describe Workflows::WorkflowStepJob do
 
             expect(workflow_step)
               .not_to have_received(:call)
+          end
+        end
+
+        context "when a condition is specified" do
+          describe "condition passed as symbol" do
+            let(:workflow_step) { workflow.workflow_steps.find_by(name: "encode_audio") }
+
+            before { workflow.workflow_steps.where(name: ["load_video", "extract_audio"]).update_all(state: "completed") } # rubocop:disable Rails/SkipsModelValidations
+
+            it "changes the workflow step status to skipped if condition returns false" do
+              ClimateControl.modify ENCODE_AUDIO: "0" do
+                expect { job.perform(workflow, workflow_step) }
+                  .to change { workflow_step.reload.state }
+                  .from(state).to("skipped")
+
+                expect(workflow_step.completed_at).to be_present
+                expect(workflow_step.failed_at).to be_nil
+              end
+            end
+
+            it "does not change the workflow step status to skipped if condition returns true" do
+              ClimateControl.modify ENCODE_AUDIO: "1" do
+                expect { job.perform(workflow, workflow_step) }
+                  .to change { workflow_step.reload.state }
+                  .from(state).to("completed")
+              end
+            end
+          end
+
+          describe "condition passed as proc" do
+            let(:workflow_step) { workflow.workflow_steps.find_by(name: "encode_video") }
+
+            before { workflow.workflow_steps.where(name: ["load_video", "extract_video"]).update_all(state: "completed") } # rubocop:disable Rails/SkipsModelValidations
+
+            it "changes the workflow step status to skipped if condition returns false" do
+              expect { job.perform(workflow, workflow_step, encode_video: false) }
+                .to change { workflow_step.reload.state }
+                .from(state).to("skipped")
+
+              expect(workflow_step.completed_at).to be_present
+              expect(workflow_step.failed_at).to be_nil
+            end
+
+            it "does not change the workflow step status to skipped if condition returns true" do
+              expect { job.perform(workflow, workflow_step, encode_video: true) }
+                .to change { workflow_step.reload.state }
+                .from(state).to("completed")
+            end
           end
         end
       end

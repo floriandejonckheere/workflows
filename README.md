@@ -161,6 +161,22 @@ workflow do
 end
 ```
 
+To define a condition on the workflow step, pass the `condition` argument with either a symbol (instance method name) or a block/proc.
+
+```ruby
+workflow do
+  step :my_step,
+       condition: :my_step?
+  
+  step :your_step,
+       condition: -> { [true, false].sample }
+end
+
+def my_step?
+  [true, false].sample
+end
+```
+
 ### Executing
 
 After creating a workflow record (the workflow step records are automatically created), execute the workflow by calling the `perform_later` method:
@@ -171,7 +187,7 @@ workflow = VideoProcessingWorkflow.create!
 workflow.perform_later
 ```
 
-Any arguments passed to `perform_later` will be passed down to the `call` method in the step classes.
+Any arguments passed to `perform_later` will be passed down to the `call` method in the step classes, and the condition methods/blocks/procs if defined.
 
 ### Migrating
 
